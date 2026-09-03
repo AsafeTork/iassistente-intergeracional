@@ -2,13 +2,11 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 type Props = {
   children: ReactNode;
-  titulo?: string;
 };
 
-export function PhoneEmulator3D({ children, titulo }: Props) {
+export function PhoneEmulator3D({ children }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [rotacao, setRotacao] = useState({ x: 0, y: 0 });
-  const [pressionado, setPressionado] = useState(false);
 
   const tratarMouseMove = useCallback((e: React.MouseEvent) => {
     const el = containerRef.current;
@@ -16,7 +14,7 @@ export function PhoneEmulator3D({ children, titulo }: Props) {
     const rect = el.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setRotacao({ x: y * -18, y: x * 18 });
+    setRotacao({ x: y * -12, y: x * 12 });
   }, []);
 
   const tratarMouseLeave = useCallback(() => {
@@ -24,25 +22,27 @@ export function PhoneEmulator3D({ children, titulo }: Props) {
   }, []);
 
   const estiloTransform = {
-    transform: `perspective(900px) rotateX(${rotacao.x}deg) rotateY(${rotacao.y}deg) ${pressionado ? 'scale(0.97)' : 'scale(1)'}`,
+    transform: `perspective(1200px) rotateX(${rotacao.x}deg) rotateY(${rotacao.y}deg)`,
   };
 
   const estiloSombra = {
     boxShadow: `
-      ${rotacao.y * -1.5}px ${rotacao.x * 1.5}px 40px rgba(0,0,0,0.25),
-      ${rotacao.y * -0.5}px ${rotacao.x * 0.5}px 10px rgba(0,0,0,0.15),
-      inset 0 0 0 1px rgba(255,255,255,0.08)
+      ${rotacao.y * -2}px ${rotacao.x * 2}px 50px rgba(0,0,0,0.35),
+      ${rotacao.y * -1}px ${rotacao.x * 1}px 15px rgba(0,0,0,0.2),
+      0 25px 60px rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      inset 0 -1px 0 rgba(0,0,0,0.3)
     `,
   };
 
   const estiloReflexo = {
     background: `linear-gradient(
-      ${105 + rotacao.y * 2}deg,
-      transparent 40%,
-      rgba(255,255,255,0.06) 45%,
-      rgba(255,255,255,0.12) 50%,
-      rgba(255,255,255,0.06) 55%,
-      transparent 60%
+      ${105 + rotacao.y * 3}deg,
+      transparent 30%,
+      rgba(255,255,255,0.03) 40%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.03) 60%,
+      transparent 70%
     )`,
   };
 
@@ -53,58 +53,58 @@ export function PhoneEmulator3D({ children, titulo }: Props) {
       onMouseMove={tratarMouseMove}
       onMouseLeave={tratarMouseLeave}
     >
-      {titulo && <p className="phone-3d-titulo">{titulo}</p>}
-
       <div className="phone-3d-perspectiva" style={estiloTransform}>
+        {/* FRAME EXTERNO - hardware do celular */}
         <div className="phone-3d-frame" style={estiloSombra}>
-          <div className="phone-3d-notch">
-            <div className="phone-3d-notch-camera" />
+
+          {/* Botões laterais - claramente hardware */}
+          <div className="phone-3d-btn-lateral-esq">
+            <div className="phone-3d-btn-hw phone-3d-btn-mudo" title="Botão silenciar" />
+            <div className="phone-3d-btn-hw phone-3d-btn-vol" title="Volume +" />
+            <div className="phone-3d-btn-hw phone-3d-btn-vol" title="Volume -" />
+          </div>
+          <div className="phone-3d-btn-lateral-dir">
+            <div className="phone-3d-btn-hw phone-3d-btn-power" title="Power" />
           </div>
 
-          <div className="phone-3d-botoes-lado">
-            <div className="phone-3d-btn-silent" />
-            <div className="phone-3d-btn-vol-up" />
-            <div className="phone-3d-btn-vol-down" />
-          </div>
-
-          <div className="phone-3d-btn-power" />
-
+          {/* TELA - área de conteúdo */}
           <div className="phone-3d-tela">
+            {/* Notch - claramente hardware, acima do conteúdo */}
+            <div className="phone-3d-notch">
+              <div className="phone-3d-notch-camera" />
+            </div>
+
+            {/* Status bar - sempre visível */}
             <div className="phone-3d-statusbar">
-              <span>9:41</span>
+              <span className="phone-3d-hora">9:41</span>
               <span className="phone-3d-status-icons">
-                <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
-                  <rect x="0" y="7" width="3" height="5" rx="0.5" opacity="0.4"/>
-                  <rect x="4" y="5" width="3" height="7" rx="0.5" opacity="0.6"/>
-                  <rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/>
-                  <rect x="12" y="0" width="3" height="12" rx="0.5"/>
+                <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
+                  <rect x="0" y="6" width="2.5" height="4" rx="0.5" opacity="0.4"/>
+                  <rect x="3.5" y="4" width="2.5" height="6" rx="0.5" opacity="0.6"/>
+                  <rect x="7" y="2" width="2.5" height="8" rx="0.5" opacity="0.8"/>
+                  <rect x="10.5" y="0" width="2.5" height="10" rx="0.5"/>
                 </svg>
-                <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
-                  <rect x="0" y="0" width="15" height="12" rx="2" fill="none" stroke="currentColor" strokeWidth="1.2"/>
-                  <rect x="1.5" y="1.5" width="10" height="9" rx="1"/>
-                  <rect x="15.5" y="3.5" width="2" height="5" rx="0.8"/>
+                <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor">
+                  <rect x="0.5" y="0.5" width="12.5" height="9" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1"/>
+                  <rect x="2" y="2" width="8" height="6" rx="0.8"/>
+                  <rect x="13.5" y="3" width="2" height="4" rx="0.6"/>
                 </svg>
               </span>
             </div>
 
+            {/* CONTEÚDO DO APP - área interativa */}
             <div className="phone-3d-conteudo">
               {children}
             </div>
 
+            {/* Home bar - claramente hardware */}
             <div className="phone-3d-homebar" />
           </div>
 
+          {/* Reflexo de vidro sobre a tela */}
           <div className="phone-3d-reflexo" style={estiloReflexo} />
         </div>
       </div>
-
-      <button
-        className="phone-3d-toucharea"
-        onMouseDown={() => setPressionado(true)}
-        onMouseUp={() => setPressionado(false)}
-        onMouseLeave={() => setPressionado(false)}
-        aria-label="Área de interação do emulador 3D"
-      />
     </div>
   );
 }

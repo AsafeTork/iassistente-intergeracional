@@ -5,28 +5,10 @@ import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { PhoneEmulator3D } from '../components/PhoneEmulator3D';
 import { PhoneScreen } from '../components/PhoneScreen';
 
-const CHAVE_PROGRESSO = 'iassistente:progresso:v1';
-
-function lerProgresso(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(CHAVE_PROGRESSO) ?? '[]');
-  } catch {
-    return [];
-  }
-}
-
 export function Demonstracao() {
   const { config } = useAcessibilidade();
-  const [indice, setIndice] = useState(0);
-  const [concluidos, setConcluidos] = useState<string[]>(lerProgresso);
-  const [mostrarErro, setMostrarErro] = useState(false);
-
-  const passo = PASSOS_GOVBR[indice];
-  const ultimo = indice === PASSOS_GOVBR.length - 1;
-  const progresso = useMemo(
-    () => Math.round(((indice + 1) / PASSOS_GOVBR.length) * 100),
-    [indice],
-  );
+  const [mensagem, setMensagem] = useState('Olá! Toque no app Chrome ou Gov.br para começar a demonstração.');
+  const [etapaAtual, setEtapaAtual] = useState(0);
 
   function anunciar(texto: string) {
     falar(texto, config.leituraEmVoz);
@@ -35,90 +17,51 @@ export function Demonstracao() {
   return (
     <div>
       <p className="migalha">
-        <Link to="/">Início</Link> › Demonstração guiada (simulação do login Gov.br)
+        <Link to="/">Início</Link> › Demonstração guiada
       </p>
-      <h1>Entrar no Gov.br com ajuda do assistente</h1>
+      <h1>Demonstração interativa</h1>
       <p className="subtitulo">
-        Interaja com o celular 3D abaixo — clique nos campos e botões como se fosse um celular real.
-        O assistente guia cada passo com voz e destaque visual.
+        Use o celular 3D como se fosse real — abra o navegador, acesse o Gov.br e siga o passo a passo.
       </p>
-
-      <div
-        className="barra-progresso"
-        role="progressbar"
-        aria-valuenow={progresso}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Progresso da demonstração"
-      >
-        <div className="barra-progresso-preenchimento" style={{ width: `${progresso}%` }} />
-        <span className="barra-progresso-texto">
-          Passo {indice + 1} de {PASSOS_GOVBR.length} • {progresso}%
-        </span>
-      </div>
-
-      <ol className="trilha" aria-label="Etapas">
-        {PASSOS_GOVBR.map((p, i) => (
-          <li key={p.id} className={i === indice ? 'trilha-item atual' : i < indice ? 'trilha-item feito' : 'trilha-item'}>
-            <button type="button" onClick={() => { setIndice(i); setMostrarErro(false); }}>
-              {i < indice ? '✓ ' : ''}{p.titulo}
-            </button>
-          </li>
-        ))}
-      </ol>
 
       <div className="demo-3d-area">
         <section className="painel-assistente" aria-live="polite" aria-label="Assistente">
           <p className="etiqueta">🤖 Assistente diz:</p>
-          <p className="fala-grande">"{passo.instrucaoAmigavel}"</p>
-          <p className="detalhe">{passo.detalhe}</p>
+          <p className="fala-grande">"{mensagem}"</p>
           <div className="acoes-linha">
-            <button type="button" className="botao botao-secundario" onClick={() => anunciar(`${passo.titulo}. ${passo.instrucaoAmigavel}`)}>
+            <button type="button" className="botao botao-secundario" onClick={() => anunciar(mensagem)}>
               🔊 Ouvir de novo
             </button>
-            {passo.erroAmigavel && (
-              <button type="button" className="botao botao-aviso" onClick={() => { setMostrarErro(true); if (passo.erroAmigavel) anunciar(passo.erroAmigavel); }}>
-                Simular erro do portal
-              </button>
-            )}
           </div>
-
-          {mostrarErro && passo.erroTecnico && (
-            <div className="erro-demo">
-              <p>
-                <strong>Portal diz (difícil):</strong> <code>{passo.erroTecnico}</code>
-              </p>
-              <p className="erro-traducao">
-                <strong>Assistente traduz (acolhedor):</strong> {passo.erroAmigavel}
-              </p>
-            </div>
-          )}
         </section>
 
-        <section className="painel-tela-3d" aria-label="Emulador 3D do portal">
-          <PhoneEmulator3D titulo="Celular 3D — toque para interagir">
-            <PhoneScreen
-              indice={indice}
-              setIndice={setIndice}
-              concluidos={concluidos}
-              setConcluidos={setConcluidos}
-              onAvancar={() => setMostrarErro(false)}
-              onErro={() => setMostrarErro(true)}
-            />
+        <section className="painel-tela-3d" aria-label="Emulador 3D do celular">
+          <PhoneEmulator3D>
+            <PhoneScreen onMensagem={setMensagem} />
           </PhoneEmulator3D>
-          <p className="privacidade-nota">🔒 Filtro de privacidade ativo: senhas e CPF ficam só neste aparelho (simulação).</p>
         </section>
       </div>
 
-      {ultimo && concluidos.includes('pronto') && (
-        <section className="selo-sucesso" aria-label="Conquista">
-          <h2>🏅 Selo "Primeiro acesso sozinho" desbloqueado!</h2>
-          <p>Progresso salvo neste navegador. No app real, seu tutor jovem seria avisado para comemorar com você.</p>
-          <Link to="/tutoria" className="botao botao-primario botao-grande">
-            Pedir acompanhamento de um tutor
-          </Link>
-        </section>
-      )}
+      <section className="demo-info-lateral">
+        <div className="demo-info-card">
+          <h3>Como usar</h3>
+          <ul>
+            <li>Toque nos <strong>ícones</strong> do celular para navegar</li>
+            <li>O <strong>assistente</strong> guia cada passo com voz</li>
+            <li>Use <strong>"Simular erro"</strong> para ver como o assistente traduz</li>
+            <li>Clique em <strong>"Ouvir de novo"</strong> para repetir a instrução</li>
+          </ul>
+        </div>
+        <div className="demo-info-card">
+          <h3>O que está sendo demonstrado</h3>
+          <ul>
+            <li>Tela inicial com apps (como um celular real)</li>
+            <li>Abrindo o navegador → Gov.br</li>
+            <li>Login passo a passo com assistente</li>
+            <li>Tradução de erros técnicos em linguagem simples</li>
+          </ul>
+        </div>
+      </section>
     </div>
   );
 }
