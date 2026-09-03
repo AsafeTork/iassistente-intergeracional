@@ -36,7 +36,7 @@ export function Demonstracao() {
         </section>
 
         <section className="painel-tela-3d" aria-label="Emulador 3D do celular">
-          <PhoneEmulator3D>
+          <PhoneEmulator3D mensagem={mensagem}>
             <PhoneScreen onMensagem={setMensagem} />
           </PhoneEmulator3D>
         </section>

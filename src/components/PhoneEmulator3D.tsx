@@ -2,9 +2,10 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 type Props = {
   children: ReactNode;
+  mensagem?: string;
 };
 
-export function PhoneEmulator3D({ children }: Props) {
+export function PhoneEmulator3D({ children, mensagem }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [rotacao, setRotacao] = useState({ x: 0, y: 0 });
 
@@ -53,11 +54,44 @@ export function PhoneEmulator3D({ children }: Props) {
       onMouseMove={tratarMouseMove}
       onMouseLeave={tratarMouseLeave}
     >
-      <div className="phone-3d-perspectiva" style={estiloTransform}>
-        {/* FRAME EXTERNO - hardware do celular */}
-        <div className="phone-3d-frame" style={estiloSombra}>
+      {/* SVG Contorno AI - animação de scan */}
+      <svg
+        className="phone-ai-contorno"
+        viewBox="0 0 348 688"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* Contorno principal - retângulo arredondado */}
+        <path
+          d="M48 4 H280 C310 4, 344 14, 344 48 V640 C344 674, 310 684, 280 684 H48 C18 684, 4 674, 4 640 V48 C4 14, 18 4, 48 4 Z"
+          stroke="url(#ai-grad)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          className="phone-ai-path"
+        />
+        {/* Cantos brilhantes */}
+        <circle cx="48" cy="4" r="4" fill="#00f5ff" className="phone-ai-dot phone-ai-dot-tl" />
+        <circle cx="280" cy="4" r="4" fill="#00f5ff" className="phone-ai-dot phone-ai-dot-tr" />
+        <circle cx="280" cy="684" r="4" fill="#00f5ff" className="phone-ai-dot phone-ai-dot-br" />
+        <circle cx="48" cy="684" r="4" fill="#00f5ff" className="phone-ai-dot phone-ai-dot-bl" />
+        {/* Linha de scan vertical */}
+        <line x1="4" y1="0" x2="344" y2="0" stroke="#00f5ff" strokeWidth="1" opacity="0.6" className="phone-ai-scanline" />
+        {/* Coordenadas animadas */}
+        <text x="350" y="48" className="phone-ai-coord" fill="#00f5ff" fontSize="9" fontFamily="monospace">x:0 y:0</text>
+        <text x="350" y="640" className="phone-ai-coord phone-ai-coord-b" fill="#00f5ff" fontSize="9" fontFamily="monospace">x:0 y:684</text>
+        <defs>
+          <linearGradient id="ai-grad" x1="0" y1="0" x2="348" y2="688" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#00f5ff" stopOpacity="0" />
+            <stop offset="20%" stopColor="#00f5ff" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#7b61ff" stopOpacity="1" />
+            <stop offset="80%" stopColor="#00f5ff" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#00f5ff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
 
-          {/* Botões laterais - claramente hardware */}
+      <div className="phone-3d-perspectiva" style={estiloTransform}>
+        <div className="phone-3d-frame" style={estiloSombra}>
           <div className="phone-3d-btn-lateral-esq">
             <div className="phone-3d-btn-hw phone-3d-btn-mudo" title="Botão silenciar" />
             <div className="phone-3d-btn-hw phone-3d-btn-vol" title="Volume +" />
@@ -67,14 +101,10 @@ export function PhoneEmulator3D({ children }: Props) {
             <div className="phone-3d-btn-hw phone-3d-btn-power" title="Power" />
           </div>
 
-          {/* TELA - área de conteúdo */}
           <div className="phone-3d-tela">
-            {/* Notch - claramente hardware, acima do conteúdo */}
             <div className="phone-3d-notch">
               <div className="phone-3d-notch-camera" />
             </div>
-
-            {/* Status bar - sempre visível */}
             <div className="phone-3d-statusbar">
               <span className="phone-3d-hora">9:41</span>
               <span className="phone-3d-status-icons">
@@ -92,19 +122,24 @@ export function PhoneEmulator3D({ children }: Props) {
               </span>
             </div>
 
-            {/* CONTEÚDO DO APP - área interativa */}
             <div className="phone-3d-conteudo">
               {children}
             </div>
 
-            {/* Home bar - claramente hardware */}
             <div className="phone-3d-homebar" />
           </div>
 
-          {/* Reflexo de vidro sobre a tela */}
           <div className="phone-3d-reflexo" style={estiloReflexo} />
         </div>
       </div>
+
+      {/* Bolinha de chat do assistente */}
+      {mensagem && (
+        <div className="phone-chat-bubble">
+          <div className="phone-chat-dot" />
+          <div className="phone-chat-texto">{mensagem}</div>
+        </div>
+      )}
     </div>
   );
 }
