@@ -30,12 +30,11 @@ pessoas com dificuldade visual/cognitiva** a usar portais como o **Gov.br** com 
 | **Capacitor-ready** (`capacitor.config.ts`, `webDir: dist`) | O mesmo `dist/` vira **APK/AAB** sem reescrever nada |
 | **Tauri/Electron-ready** (`src-tauri-stub/`, `electron/`) | O mesmo `dist/` vira **.exe/.deb** (Tauri leve 3–10 MB; Electron 80–150 MB) |
 
-Alternativas descartadas: Next.js (SSR desnecessário p/ protótipo estático), Astro (ótimo p/ conteúdo,
-menos p/ app interativo), Flutter (exigiria reescrever tudo em Dart), Ionic (peso extra agora).
+Alternativas descartadas: Next.js (SSR desnecessário p/ protótipo estático), Astro (ótimo p/ conteúdo, menos p/ app interativo), Flutter (exigiria reescrever tudo em Dart), Ionic (peso extra agora).
 
-Fontes: tutorial Capacitor+React 2026 (noqta.tn), guia Vite PWA/Workbox (vite-pwa-org.netlify.app),
-comparativos Flutter×Capacitor×Tauri×Electron 2026 (oflight.co.jp, youngju.dev, capawesome.io),
-WCAG 2.1 AA e guias de design para idosos.
+**Regra de decisão 2026** ([ourcodeworld.com](https://ourcodeworld.com/articles/read/3646/pwa-vs-capacitor-vs-native-2026)): 1) default a **PWA** (já instalável sem loja); 2) vá a **Capacitor** para App Store/Play Store mantendo 1 codebase web; 3) vá a **nativo** só quando performance for o produto. O mesmo `dist/` do Vite reutiliza em Capacitor (mobile), Tauri 2.x (desktop **+ mobile**, binário 20–50× menor e ~5× menos RAM que Electron ([rustify.rs](https://rustify.rs/articles/rust-tauri-vs-electron-2026))) e qualquer hospedagem estática.
+
+Fontes: tutorial Capacitor+React 2026 ([noqta.tn](https://noqta.tn/en/tutorials/capacitor-react-mobile-app-ios-android-2026)), guia Vite PWA/Workbox ([vite-pwa-org.netlify.app](https://vite-pwa-org.netlify.app/)), decisões PWA/Capacitor/Nativo 2026 ([ourcodeworld.com](https://ourcodeworld.com/articles/read/3646/pwa-vs-capacitor-vs-native-2026)), Tauri vs Electron 2026 ([tech-insider.org](https://tech-insider.org/tauri-vs-electron-2026/), [rustify.rs](https://rustify.rs/articles/rust-tauri-vs-electron-2026)), comparativos 2026 ([oflight.co.jp](https://www.oflight.co.jp/en/columns/flutter-rn-capacitor-tauri-overview-2026), [youngju.dev](https://www.youngju.dev/blog/culture/2026-05-14-desktop-app-frameworks-2026-tauri-electron-wails-compose-multiplatform-maui-flutter-comparison-deep-dive-2026.en)), capawesome.io, WCAG 2.1 AA e guias de design para idosos.
 
 ## Como rodar localmente
 
