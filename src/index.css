@@ -591,7 +591,8 @@ body.alto-contraste .erro-demo {
 @media (max-width: 860px) {
   .destaque,
   .demo-grade,
-  .filtro-demo {
+  .filtro-demo,
+  .demo-3d-area {
     grid-template-columns: 1fr;
   }
   h1 {
@@ -600,10 +601,454 @@ body.alto-contraste .erro-demo {
   .fala-grande {
     font-size: 1.3rem;
   }
+  .phone-3d-frame {
+    width: 260px;
+    height: 540px;
+  }
+  .phone-3d-container {
+    min-height: 480px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+}
+
+/* ===========================
+   EMULADOR 3D - CELULAR
+   =========================== */
+.phone-3d-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 540px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.phone-3d-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--azul);
+  margin-bottom: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.phone-3d-perspectiva {
+  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.phone-3d-frame {
+  position: relative;
+  width: 280px;
+  height: 580px;
+  background: #1a1a2e;
+  border-radius: 44px;
+  padding: 12px;
+  transition: box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+/* Borda cromada sutil */
+.phone-3d-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 44px;
+  border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Notch / Dynamic Island */
+.phone-3d-notch {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+}
+
+.phone-3d-notch-camera {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #1a1a3a 40%, #0a0a1a 60%);
+  border-radius: 50%;
+  border: 1.5px solid #2a2a4a;
+}
+
+/* Botões laterais */
+.phone-3d-botoes-lado {
+  position: absolute;
+  left: -3px;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phone-3d-btn-silent {
+  width: 3px;
+  height: 24px;
+  background: #3a3a5a;
+  border-radius: 2px;
+  margin-left: 4px;
+}
+
+.phone-3d-btn-vol-up,
+.phone-3d-btn-vol-down {
+  width: 3px;
+  height: 36px;
+  background: #3a3a5a;
+  border-radius: 2px;
+  margin-left: 4px;
+}
+
+.phone-3d-btn-power {
+  position: absolute;
+  right: -3px;
+  top: 130px;
+  width: 3px;
+  height: 50px;
+  background: #3a3a5a;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+/* Tela */
+.phone-3d-tela {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 34px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Status bar */
+.phone-3d-statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111;
+  background: var(--azul);
+  flex-shrink: 0;
+}
+
+.phone-3d-status-icons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Conteúdo do app */
+.phone-3d-conteudo {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.phone-3d-conteudo::-webkit-scrollbar {
+  width: 3px;
+}
+.phone-3d-conteudo::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+/* Home bar inferior */
+.phone-3d-homebar {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.phone-3d-homebar::after {
+  content: '';
+  width: 100px;
+  height: 4px;
+  background: #111;
+  border-radius: 4px;
+  opacity: 0.2;
+}
+
+/* Reflexo de vidro */
+.phone-3d-reflexo {
+  position: absolute;
+  inset: 12px;
+  border-radius: 34px;
+  pointer-events: none;
+  z-index: 15;
+  transition: background 0.15s ease;
+  mix-blend-mode: overlay;
+}
+
+/* Touch area transparente */
+.phone-3d-toucharea {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: default;
+  z-index: 0;
+}
+
+/* ===========================
+   CONTEÚDO INTERNO DO CELULAR
+   =========================== */
+.phone-ui-header {
+  background: var(--azul);
+  color: #fff;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+.phone-ui-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.2rem 0.5rem 0.8rem;
+}
+
+.phone-ui-logo-gov {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--amarelo);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.phone-ui-logo-sub {
+  font-size: 0.65rem;
+  color: var(--texto-suave);
+  margin-top: 2px;
+}
+
+.phone-ui-campo {
+  margin: 0.6rem;
+  border: 3px solid var(--amarelo);
+  border-radius: 10px;
+  padding: 0.5rem;
+  background: #fffbe6;
+  animation: phone-pulse 2s infinite;
+}
+
+@keyframes phone-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,210,63,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(255,210,63,0); }
+}
+
+.phone-ui-campo label {
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: #111;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.phone-ui-campo input {
+  width: 100%;
+  font-size: 0.95rem;
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: 1.5px solid #999;
+  font-family: inherit;
+}
+
+.phone-ui-campo small {
+  display: block;
+  margin-top: 3px;
+  color: var(--texto-suave);
+  font-size: 0.6rem;
+}
+
+.phone-ui-btn {
+  display: block;
+  width: calc(100% - 1.2rem);
+  margin: 0.5rem 0.6rem;
+  padding: 0.55rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+.phone-ui-btn-primario {
+  background: var(--amarelo);
+  color: #111;
+  border-color: var(--amarelo-borda);
+}
+
+.phone-ui-btn-secundario {
+  background: #fff;
+  color: var(--azul);
+  border-color: var(--azul);
+}
+
+.phone-ui-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.phone-ui-botoes {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.phone-ui-botoes .phone-ui-btn {
+  flex: 1;
+  margin: 0;
+}
+
+.phone-ui-info {
+  margin: 0.6rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  background: #eef6ff;
+  color: #111;
+  font-size: 0.75rem;
+}
+
+.phone-ui-erro {
+  margin: 0.5rem 0.6rem;
+  border: 2px dashed var(--vermelho);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: #fff5f5;
+  font-size: 0.7rem;
+}
+
+.phone-ui-erro-traducao {
+  margin-top: 0.4rem;
+  background: #e6f4ea;
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-size: 0.7rem;
+}
+
+.phone-ui-progresso {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  margin: 0.5rem 0.6rem 0;
+  overflow: hidden;
+}
+
+.phone-ui-progresso-fill {
+  height: 100%;
+  background: var(--verde);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.phone-ui-nav {
+  display: flex;
+  gap: 3px;
+  padding: 0.5rem 0.6rem;
+  flex-wrap: wrap;
+}
+
+.phone-ui-nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ccc;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.phone-ui-nav-dot.ativo {
+  background: var(--amarelo);
+  width: 14px;
+  border-radius: 3px;
+}
+
+.phone-ui-nav-dot.feito {
+  background: var(--azul);
+}
+
+.phone-ui-privacidade {
+  text-align: center;
+  font-size: 0.6rem;
+  color: var(--texto-suave);
+  padding: 0.3rem 0.6rem 0;
+}
+
+/* Acessibilidade - reduzir movimento */
+@media (prefers-reduced-motion: reduce) {
+  .phone-3d-perspectiva {
+    transition: none !important;
+  }
+  .phone-ui-campo {
+    animation: none !important;
+  }
+}
+
+/* Layout demo 3D */
+.demo-3d-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.painel-tela-3d {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: var(--raio);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.painel-tela-3d .privacidade-nota {
+  color: rgba(255,255,255,0.5);
+  margin-top: 1rem;
+}
+
+@media (max-width: 860px) {
+  .phone-3d-frame {
+    width: 260px;
+    height: 540px;
+  }
+  .phone-3d-container {
+    min-height: 480px;
   }
 }
