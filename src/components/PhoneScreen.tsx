@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PASSOS_GOVBR } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
+import { AIScanHighlight } from './AIScanHighlight';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
 
@@ -25,7 +26,7 @@ export function PhoneScreen({ onMensagem }: Props) {
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
-  const [digitando, setDigitando] = useState(false);
+  const [scanIndex, setScanIndex] = useState(-1);
 
   const passo = PASSOS_GOVBR[indice];
 
@@ -33,6 +34,21 @@ export function PhoneScreen({ onMensagem }: Props) {
     falar(texto, config.leituraEmVoz);
     onMensagem?.(texto);
   }
+
+  // Scan sequencial dos apps na home
+  useEffect(() => {
+    if (tela !== 'home') {
+      setScanIndex(-1);
+      return;
+    }
+    setScanIndex(0);
+    const timers: number[] = [];
+    for (let i = 0; i < APPS.length; i++) {
+      timers.push(window.setTimeout(() => setScanIndex(i), 800 + i * 600));
+    }
+    timers.push(window.setTimeout(() => setScanIndex(-1), 800 + APPS.length * 600 + 1000));
+    return () => timers.forEach(clearTimeout);
+  }, [tela]);
 
   function abrirNavegador() {
     setTela('navegador');
@@ -82,7 +98,7 @@ export function PhoneScreen({ onMensagem }: Props) {
         <div className="ph-home-clock">9:41</div>
         <div className="ph-home-data">Quarta-feira, 3 de setembro</div>
         <div className="ph-app-grid">
-          {APPS.map((app) => (
+          {APPS.map((app, i) => (
             <button
               key={app.id}
               className="ph-app-icone"
@@ -92,9 +108,17 @@ export function PhoneScreen({ onMensagem }: Props) {
                 else anunciar(`App ${app.nome} — funcionalidade não disponível nesta demonstração.`);
               }}
             >
-              <div className="ph-app-icone-img" style={{ background: app.cor }}>
-                <span>{app.icone}</span>
-              </div>
+              {scanIndex === i ? (
+                <AIScanHighlight delay={0}>
+                  <div className="ph-app-icone-img" style={{ background: app.cor }}>
+                    <span>{app.icone}</span>
+                  </div>
+                </AIScanHighlight>
+              ) : (
+                <div className="ph-app-icone-img" style={{ background: app.cor }}>
+                  <span>{app.icone}</span>
+                </div>
+              )}
               <span className="ph-app-icone-nome">{app.nome}</span>
             </button>
           ))}
@@ -129,10 +153,12 @@ export function PhoneScreen({ onMensagem }: Props) {
     return (
       <div className="ph-browser">
         <div className="ph-browser-bar">
-          <div className="ph-browser-url">
-            <span className="ph-browser-lock">🔒</span>
-            <span>gov.br</span>
-          </div>
+          <AIScanHighlight delay={0.3}>
+            <div className="ph-browser-url">
+              <span className="ph-browser-lock">🔒</span>
+              <span>gov.br</span>
+            </div>
+          </AIScanHighlight>
         </div>
         <div className="ph-browser-loading">
           <div className="ph-browser-spinner" />
@@ -155,9 +181,11 @@ export function PhoneScreen({ onMensagem }: Props) {
               <p>Acesse serviços do governo com segurança</p>
             </div>
           </div>
-          <button className="ph-govbr-btn-entrar" onClick={abrirGovbr}>
-            Entrar com Gov.br
-          </button>
+          <AIScanHighlight delay={0.5} cor="#ffd23f">
+            <button className="ph-govbr-btn-entrar" onClick={abrirGovbr}>
+              Entrar com Gov.br
+            </button>
+          </AIScanHighlight>
           <div className="ph-govbr-info">
             <p>🔹 Acesse mais de 4.000 serviços</p>
             <p>🔹 Segurança garantida</p>
@@ -174,9 +202,11 @@ export function PhoneScreen({ onMensagem }: Props) {
         <div className="ph-sucesso-icone">🎉</div>
         <h3>Conta aberta!</h3>
         <p>Você acessou o Gov.br com sucesso.</p>
-        <button className="ph-btn ph-btn-primario" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
-          Voltar ao início
-        </button>
+        <AIScanHighlight delay={0.5} cor="#1d7a3a">
+          <button className="ph-btn ph-btn-primario" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
+            Voltar ao início
+          </button>
+        </AIScanHighlight>
       </div>
     );
   }
@@ -213,23 +243,20 @@ export function PhoneScreen({ onMensagem }: Props) {
       </div>
 
       {passo.campo ? (
-        <div className="ph-login-campo">
-          <label>{passo.campo.rotulo}</label>
-          <input
-            value={valor}
-            onChange={(e) => {
-              setValor(e.target.value);
-              setDigitando(true);
-            }}
-            onFocus={() => setDigitando(true)}
-            onBlur={() => setDigitando(false)}
-            placeholder={passo.campo.exemplo}
-            inputMode={passo.campo.tipo === 'texto' ? 'text' : 'numeric'}
-            type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
-            autoComplete="off"
-          />
-          <small>🔒 Dados ficam só neste aparelho</small>
-        </div>
+        <AIScanHighlight delay={0.2}>
+          <div className="ph-login-campo">
+            <label>{passo.campo.rotulo}</label>
+            <input
+              value={valor}
+              onChange={(e) => setValor(e.target.value)}
+              placeholder={passo.campo.exemplo}
+              inputMode={passo.campo.tipo === 'texto' ? 'text' : 'numeric'}
+              type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
+              autoComplete="off"
+            />
+            <small>🔒 Dados ficam só neste aparelho</small>
+          </div>
+        </AIScanHighlight>
       ) : (
         <div className="ph-login-info">
           {indice === PASSOS_GOVBR.length - 1
@@ -255,9 +282,11 @@ export function PhoneScreen({ onMensagem }: Props) {
         <button className="ph-btn ph-btn-secundario" onClick={voltar} disabled={indice === 0}>
           ← Voltar
         </button>
-        <button className="ph-btn ph-btn-primario" onClick={avancar}>
-          {indice === PASSOS_GOVBR.length - 1 ? 'Concluir 🎉' : 'Continuar →'}
-        </button>
+        <AIScanHighlight delay={0.4}>
+          <button className="ph-btn ph-btn-primario" onClick={avancar}>
+            {indice === PASSOS_GOVBR.length - 1 ? 'Concluir 🎉' : 'Continuar →'}
+          </button>
+        </AIScanHighlight>
       </div>
 
       {passo.erroAmigavel && !mostrarErro && (

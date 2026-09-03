@@ -1421,107 +1421,171 @@ body.alto-contraste .erro-demo {
 }
 
 /* ===========================
-   CONTORNO AI - ANIMAÇÃO
+   SCAN DE ELEMENTOS AI
    =========================== */
-.phone-ai-contorno {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 348px;
-  height: 688px;
-  pointer-events: none;
-  z-index: 30;
-  opacity: 0;
-  animation: ai-appear 0.3s ease-out 1.5s forwards;
+.ai-scan {
+  position: relative;
+  display: inline-block;
+  animation: ai-scan-fadein 0.3s ease-out var(--ai-delay, 0s) both;
 }
 
-@keyframes ai-appear {
+@keyframes ai-scan-fadein {
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
 
-.phone-ai-path {
-  stroke-dasharray: 2100;
-  stroke-dashoffset: 2100;
-  animation: ai-draw 2.5s ease-in-out 1.8s forwards;
-  filter: drop-shadow(0 0 6px rgba(0, 245, 255, 0.5));
+/* Contorno brilhante */
+.ai-scan::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--ai-color, #00f5ff);
+  border-radius: 10px;
+  opacity: 0;
+  animation: ai-scan-border 1.2s ease-in-out var(--ai-delay, 0s) both;
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--ai-color, #00f5ff) 50%, transparent),
+    inset 0 0 8px color-mix(in srgb, var(--ai-color, #00f5ff) 20%, transparent);
 }
 
-@keyframes ai-draw {
+@keyframes ai-scan-border {
   0% {
-    stroke-dashoffset: 2100;
-    filter: drop-shadow(0 0 2px rgba(0, 245, 255, 0.3));
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
   }
-  50% {
-    filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.8));
+  30% {
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  }
+  60% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%);
   }
   100% {
-    stroke-dashoffset: 0;
-    filter: drop-shadow(0 0 6px rgba(0, 245, 255, 0.5));
+    opacity: 0.8;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
 }
 
-/* Cantos brilhantes */
-.phone-ai-dot {
+/* Brilho de scan que percorre */
+.ai-scan::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ai-color, #00f5ff) 30%, transparent) 50%,
+    transparent 100%
+  );
   opacity: 0;
-  animation: ai-dot-pop 0.4s ease-out forwards;
+  animation: ai-scan-gleam 1.2s ease-in-out var(--ai-delay, 0s) both;
 }
 
-.phone-ai-dot-tl { animation-delay: 2.0s; }
-.phone-ai-dot-tr { animation-delay: 2.4s; }
-.phone-ai-dot-br { animation-delay: 2.8s; }
-.phone-ai-dot-bl { animation-delay: 3.2s; }
-
-@keyframes ai-dot-pop {
-  0% { opacity: 0; r: 0; }
-  60% { opacity: 1; r: 6; }
-  100% { opacity: 0.9; r: 4; }
-}
-
-/* Linha de scan */
-.phone-ai-scanline {
-  stroke-dasharray: 340;
-  stroke-dashoffset: 688;
-  animation: ai-scan 2s ease-in-out 1.8s forwards;
-}
-
-@keyframes ai-scan {
+@keyframes ai-scan-gleam {
   0% {
-    stroke-dashoffset: 688;
-    y1: 0;
-    y2: 0;
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
   }
   100% {
-    stroke-dashoffset: 0;
-    y1: 0;
-    y2: 688;
+    opacity: 0;
+    transform: translateX(100%);
   }
 }
 
-/* Coordenadas */
-.phone-ai-coord {
+/* Cantos brilhantes do scan */
+.ai-scan-brilho {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  z-index: 2;
   opacity: 0;
-  animation: ai-coord-appear 0.5s ease-out 2.5s forwards;
 }
 
-.phone-ai-coord-b {
-  animation-delay: 3.0s;
+.ai-scan-brilho::before,
+.ai-scan-brilho::after {
+  content: '';
+  position: absolute;
+  background: var(--ai-color, #00f5ff);
+  border-radius: 1px;
 }
 
-@keyframes ai-coord-appear {
-  0% { opacity: 0; }
-  100% { opacity: 0.7; }
+.ai-scan-brilho::before {
+  width: 100%;
+  height: 2px;
 }
 
-/* Contorno pulsante após desenho */
-.phone-ai-path {
-  animation: ai-draw 2.5s ease-in-out 1.8s forwards, ai-pulse 3s ease-in-out 4.5s infinite;
+.ai-scan-brilho::after {
+  width: 2px;
+  height: 100%;
 }
 
-@keyframes ai-pulse {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(0, 245, 255, 0.4)); }
-  50% { filter: drop-shadow(0 0 12px rgba(0, 245, 255, 0.9)); }
+.ai-scan-tl { top: -6px; left: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.1s) both; }
+.ai-scan-tr { top: -6px; right: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.2s) both; }
+.ai-scan-br { bottom: -6px; right: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.3s) both; }
+.ai-scan-bl { bottom: -6px; left: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.4s) both; }
+
+@keyframes ai-scan-corner {
+  0% { opacity: 0; transform: scale(0); }
+  60% { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 0.9; transform: scale(1); }
+}
+
+/* Linha de scan vertical */
+.ai-scan-linha-vert {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--ai-color, #00f5ff), transparent);
+  opacity: 0;
+  animation: ai-scan-vline 0.8s ease-in-out calc(var(--ai-delay, 0s) + 0.2s) both;
+}
+
+@keyframes ai-scan-vline {
+  0% { opacity: 0; transform: scaleY(0); }
+  50% { opacity: 0.6; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
+}
+
+/* Linha de scan horizontal */
+.ai-scan-linha-horiz {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ai-color, #00f5ff), transparent);
+  opacity: 0;
+  animation: ai-scan-hline 0.8s ease-in-out calc(var(--ai-delay, 0s) + 0.3s) both;
+}
+
+@keyframes ai-scan-hline {
+  0% { opacity: 0; transform: scaleX(0); }
+  50% { opacity: 0.6; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* Reduzir movimento */
+@media (prefers-reduced-motion: reduce) {
+  .ai-scan,
+  .ai-scan::before,
+  .ai-scan::after,
+  .ai-scan-brilho,
+  .ai-scan-linha-vert,
+  .ai-scan-linha-horiz {
+    animation: none !important;
+    opacity: 0.7 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
 }
 
 /* ===========================
@@ -1580,16 +1644,14 @@ body.alto-contraste .erro-demo {
 }
 
 .phone-chat-texto {
-  background: linear-gradient(135deg, rgba(0, 245, 255, 0.12), rgba(123, 97, 255, 0.12));
-  border: 1px solid rgba(0, 245, 255, 0.25);
+  background: #1a1a2e;
+  border: 1.5px solid rgba(0, 245, 255, 0.5);
   border-radius: 12px 12px 12px 4px;
   padding: 8px 10px;
   font-size: 0.65rem;
-  color: #c0e8ff;
+  color: #fff;
   line-height: 1.4;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(0, 245, 255, 0.15);
 }
 
 /* Efeito de digitação no chat */
@@ -1600,20 +1662,15 @@ body.alto-contraste .erro-demo {
   right: 12px;
   width: 8px;
   height: 8px;
-  background: rgba(0, 245, 255, 0.12);
-  border-right: 1px solid rgba(0, 245, 255, 0.25);
-  border-bottom: 1px solid rgba(0, 245, 255, 0.25);
+  background: #1a1a2e;
+  border-right: 1.5px solid rgba(0, 245, 255, 0.5);
+  border-bottom: 1.5px solid rgba(0, 245, 255, 0.5);
   transform: rotate(45deg);
   clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
-/* Responsivo contorno AI */
+/* Responsivo chat */
 @media (max-width: 860px) {
-  .phone-ai-contorno {
-    width: 308px;
-    height: 608px;
-  }
-
   .phone-chat-bubble {
     max-width: 180px;
     bottom: 60px;
@@ -1628,15 +1685,9 @@ body.alto-contraste .erro-demo {
 
 /* Reduzir movimento */
 @media (prefers-reduced-motion: reduce) {
-  .phone-ai-contorno,
-  .phone-ai-path,
-  .phone-ai-dot,
-  .phone-ai-scanline,
-  .phone-ai-coord,
   .phone-chat-bubble,
   .phone-chat-dot {
     animation: none !important;
     opacity: 1 !important;
-    stroke-dashoffset: 0 !important;
   }
 }
