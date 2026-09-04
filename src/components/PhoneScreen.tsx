@@ -17,11 +17,30 @@ function Bullet() {
   );
 }
 
-function Brasil() {
+function GovLogo({ small = false }: { small?: boolean }) {
   return (
-    <svg viewBox="0 0 32 32" width="1em" height="1em" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="6" fill="var(--azul)"/>
-      <text x="16" y="21" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold" fontFamily="system-ui">G</text>
+    <svg viewBox="0 0 120 40" width={small ? 64 : 88} height={small ? 22 : 30} role="img" aria-label="gov.br">
+      <text x="0" y="28" fontFamily="'Rawline', system-ui" fontWeight="800" fontSize="28" fill="#1351B4">gov</text>
+      <text x="52" y="28" fontFamily="'Rawline', system-ui" fontWeight="400" fontSize="28" fill="#1351B4">.br</text>
+    </svg>
+  );
+}
+
+function GovLogoWhite({ small = false }: { small?: boolean }) {
+  return (
+    <svg viewBox="0 0 120 40" width={small ? 64 : 88} height={small ? 22 : 30} role="img" aria-label="gov.br">
+      <text x="0" y="28" fontFamily="'Rawline', system-ui" fontWeight="800" fontSize="28" fill="#fff">gov</text>
+      <text x="52" y="28" fontFamily="'Rawline', system-ui" fontWeight="400" fontSize="28" fill="#fff">.br</text>
+    </svg>
+  );
+}
+
+function Hamburger({ color = '#fff' }: { color?: string }) {
+  return (
+    <svg viewBox="0 0 24 16" width="20" height="14" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="24" height="2" rx="1" fill={color} />
+      <rect x="0" y="7" width="24" height="2" rx="1" fill={color} />
+      <rect x="0" y="14" width="24" height="2" rx="1" fill={color} />
     </svg>
   );
 }
@@ -203,7 +222,7 @@ function Pessoas() {
 }
 
 const APPS: { id: string; nome: string; cor: string; icone: ReactNode }[] = [
-  { id: 'govbr', nome: 'Gov.br', cor: '#1351b4', icone: <Brasil /> },
+  { id: 'govbr', nome: 'Gov.br', cor: '#1351b4', icone: <GovLogoWhite small /> },
   { id: 'chrome', nome: 'Chrome', cor: '#4285f4', icone: <Globe /> },
   { id: 'whatsapp', nome: 'WhatsApp', cor: '#25d366', icone: <Chat /> },
   { id: 'camera', nome: 'Câmera', cor: '#333', icone: <Camera /> },
@@ -363,15 +382,17 @@ export function PhoneScreen({ onMensagem }: Props) {
   if (tela === 'govbr') {
     return (
       <div className="ph-govbr">
-        <div className="ph-govbr-header">
-          <div className="ph-govbr-logo">gov.br</div>
+        <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
+          <GovLogoWhite />
+          <button aria-label="Menu" style={{ background: 'transparent', border: 'none', padding: 4, display: 'flex', cursor: 'pointer' }}>
+            <Hamburger />
+          </button>
         </div>
+        <div style={{ height: 2, background: '#FFCD07', flexShrink: 0 }} />
         <div className="ph-govbr-conteudo">
-          <div className="ph-govbr-banner">
-            <div className="ph-govbr-banner-texto">
-              <strong>Bem-vindo ao Gov.br</strong>
-              <p>Acesse serviços do governo com segurança</p>
-            </div>
+          <div style={{ background: '#fff', borderLeft: '4px solid #1351B4', padding: '12px 14px', borderRadius: 4, boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}>
+            <strong style={{ display: 'block', fontSize: '0.95rem', color: '#1351B4', lineHeight: 1.2 }}>Acesse sua conta com gov.br</strong>
+            <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: '#555', lineHeight: 1.4 }}>Acesse serviços do governo com sua conta gov.br</p>
           </div>
           <AIScanHighlight delay={0.5} cor="#ffd23f">
             <button className="ph-govbr-btn-entrar" onClick={abrirGovbr}>
@@ -407,14 +428,23 @@ export function PhoneScreen({ onMensagem }: Props) {
 
   return (
     <div className="ph-login">
-      <div className="ph-login-header">
-        <button className="ph-login-back" onClick={() => setTela('govbr')} aria-label="Voltar"><SetaEsq /></button>
-        <span>Entrar com Gov.br</span>
+      <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={() => setTela('govbr')} aria-label="Voltar" style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 4, color: '#fff' }}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+          </button>
+          <GovLogoWhite small />
+        </div>
+        <button aria-label="Menu" style={{ background: 'transparent', border: 'none', padding: 4, display: 'flex', cursor: 'pointer' }}>
+          <Hamburger />
+        </button>
       </div>
-
-      <div className="ph-login-logo">
-        <div className="ph-login-logo-icon"><Brasil /></div>
-        <div className="ph-login-logo-text">gov.br</div>
+      <div style={{ height: 2, background: '#FFCD07', flexShrink: 0 }} />
+      <div style={{ padding: '10px 16px 0', textAlign: 'left' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#1351B4' }}>Entrar com gov.br</span>
       </div>
 
       <div className="ph-login-progresso">
@@ -435,8 +465,8 @@ export function PhoneScreen({ onMensagem }: Props) {
 
       {passo.campo ? (
         <AIScanHighlight delay={0.2}>
-          <div className="ph-login-campo">
-            <label>{passo.campo.rotulo}</label>
+          <div style={{ margin: '10px 16px', background: '#fff', border: 'none', padding: 0 }}>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#1351B4', marginBottom: 6 }}>{passo.campo.rotulo}</label>
             <input
               value={valor}
               onChange={(e) => setValor(e.target.value)}
@@ -444,8 +474,9 @@ export function PhoneScreen({ onMensagem }: Props) {
               inputMode={passo.campo.tipo === 'texto' ? 'text' : 'numeric'}
               type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
               autoComplete="off"
+              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: '1.5px solid #1351B4', fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: '#333', background: '#fff' }}
             />
-            <small><Cadeado /> Dados ficam só neste aparelho</small>
+            <small style={{ display: 'block', marginTop: 6, color: '#595959', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
           </div>
         </AIScanHighlight>
       ) : (

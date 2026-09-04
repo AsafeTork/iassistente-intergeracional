@@ -18,6 +18,13 @@
   --raio: 14px;
   --largura: 1080px;
   --fonte: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.18);
+  --glass-blur: blur(20px) saturate(180%);
+  --gemini-blue: #4285f4;
+  --gemini-purple: #9c27b0;
+  --gemini-pink: #e91e63;
+  --gemini-gradient: linear-gradient(135deg, #4285f4, #9c27b0, #e91e63, #ff9800);
 }
 
 * {
@@ -1537,173 +1544,69 @@ body.alto-contraste .erro-demo {
   }
 }
 
-/* ===========================
-   SCAN DE ELEMENTOS AI
-   =========================== */
-.ai-scan {
+.ai-focus {
   position: relative;
-  display: inline-block;
-  animation: ai-scan-fadein 0.3s ease-out var(--ai-delay, 0s) both;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: auto;
 }
+.ai-focus > *:first-child { pointer-events: auto; }
 
-@keyframes ai-scan-fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-/* Contorno brilhante */
-.ai-scan::before {
+/* Outer glow — fora do elemento, não por cima */
+.ai-focus::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -6px;
+  border-radius: 12px;
   border: 2px solid var(--ai-color, #00f5ff);
-  border-radius: 10px;
   opacity: 0;
-  animation: ai-scan-border 1.2s ease-in-out var(--ai-delay, 0s) both;
-  box-shadow:
-    0 0 8px color-mix(in srgb, var(--ai-color, #00f5ff) 50%, transparent),
-    inset 0 0 8px color-mix(in srgb, var(--ai-color, #00f5ff) 20%, transparent);
+  animation: ai-focus-glow 1.4s ease-out var(--ai-delay, 0s) both;
+  pointer-events: none;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--ai-color) 40%, transparent), 0 0 32px color-mix(in srgb, var(--ai-color) 15%, transparent);
+}
+@keyframes ai-focus-glow {
+  0% { opacity: 0; transform: scale(0.92); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1); }
 }
 
-@keyframes ai-scan-border {
-  0% {
-    opacity: 0;
-    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-  }
-  30% {
-    opacity: 1;
-    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-  }
-  60% {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%);
-  }
-  100% {
-    opacity: 0.8;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  }
-}
-
-/* Brilho de scan que percorre */
-.ai-scan::after {
-  content: '';
+/* Seta indicadora à direita, fora do fluxo */
+.ai-focus-arrow {
   position: absolute;
-  inset: -4px;
-  border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--ai-color, #00f5ff) 30%, transparent) 50%,
-    transparent 100%
-  );
-  opacity: 0;
-  animation: ai-scan-gleam 1.2s ease-in-out var(--ai-delay, 0s) both;
-}
-
-@keyframes ai-scan-gleam {
-  0% {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-/* Cantos brilhantes do scan */
-.ai-scan-brilho {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  z-index: 2;
-  opacity: 0;
-}
-
-.ai-scan-brilho::before,
-.ai-scan-brilho::after {
-  content: '';
-  position: absolute;
-  background: var(--ai-color, #00f5ff);
-  border-radius: 1px;
-}
-
-.ai-scan-brilho::before {
-  width: 100%;
-  height: 2px;
-}
-
-.ai-scan-brilho::after {
-  width: 2px;
-  height: 100%;
-}
-
-.ai-scan-tl { top: -6px; left: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.1s) both; }
-.ai-scan-tr { top: -6px; right: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.2s) both; }
-.ai-scan-br { bottom: -6px; right: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.3s) both; }
-.ai-scan-bl { bottom: -6px; left: -6px; animation: ai-scan-corner 0.3s ease-out calc(var(--ai-delay, 0s) + 0.4s) both; }
-
-@keyframes ai-scan-corner {
-  0% { opacity: 0; transform: scale(0); }
-  60% { opacity: 1; transform: scale(1.3); }
-  100% { opacity: 0.9; transform: scale(1); }
-}
-
-/* Linha de scan vertical */
-.ai-scan-linha-vert {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: 50%;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, var(--ai-color, #00f5ff), transparent);
-  opacity: 0;
-  animation: ai-scan-vline 0.8s ease-in-out calc(var(--ai-delay, 0s) + 0.2s) both;
-}
-
-@keyframes ai-scan-vline {
-  0% { opacity: 0; transform: scaleY(0); }
-  50% { opacity: 0.6; transform: scaleY(1); }
-  100% { opacity: 0; transform: scaleY(1); }
-}
-
-/* Linha de scan horizontal */
-.ai-scan-linha-horiz {
-  position: absolute;
-  left: -4px;
-  right: -4px;
+  right: -22px;
   top: 50%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--ai-color, #00f5ff), transparent);
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--ai-color, #00f5ff);
   opacity: 0;
-  animation: ai-scan-hline 0.8s ease-in-out calc(var(--ai-delay, 0s) + 0.3s) both;
+  animation: ai-arrow-in 0.4s ease-out calc(var(--ai-delay, 0s) + 0.6s) both;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--ai-color));
 }
+@keyframes ai-arrow-in { 0%{opacity:0; transform:translateY(-50%) translateX(-8px)} 100%{opacity:1; transform:translateY(-50%) translateX(0)} }
 
-@keyframes ai-scan-hline {
-  0% { opacity: 0; transform: scaleX(0); }
-  50% { opacity: 0.6; transform: scaleX(1); }
-  100% { opacity: 0; transform: scaleX(1); }
+/* Label flutuante acima */
+.ai-focus-label {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--ai-color, #00f5ff);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  animation: ai-label-in 0.3s ease-out calc(var(--ai-delay, 0s) + 0.4s) both;
+  pointer-events: none;
 }
+@keyframes ai-label-in { 0%{opacity:0; transform:translateX(-50%) translateY(4px)} 100%{opacity:1; transform:translateX(-50%) translateY(0)} }
 
-/* Reduzir movimento */
-@media (prefers-reduced-motion: reduce) {
-  .ai-scan,
-  .ai-scan::before,
-  .ai-scan::after,
-  .ai-scan-brilho,
-  .ai-scan-linha-vert,
-  .ai-scan-linha-horiz {
-    animation: none !important;
-    opacity: 0.7 !important;
-    transform: none !important;
-    clip-path: none !important;
-  }
-}
+@media (prefers-reduced-motion: reduce) { .ai-focus::before,.ai-focus-arrow,.ai-focus-label{animation:none !important; opacity:0.8 !important} }
 
 /* ===========================
    BOLINHA DE CHAT
@@ -1807,6 +1710,40 @@ body.alto-contraste .erro-demo {
     animation: none !important;
     opacity: 1 !important;
   }
+}
+
+/* ===========================
+   FUTURISTA MINIMALISTA
+   =========================== */
+
+:root { --fonte-futurista: 'Geist', 'Inter', system-ui, sans-serif; --tracking-tight: -0.02em; }
+h1,h2,h3 { font-family: var(--fonte-futurista); letter-spacing: var(--tracking-tight); font-weight: 700; }
+.subtitulo, .detalhe, .secao-sub { font-weight: 400; opacity: 0.85; line-height: 1.7; }
+
+.botao { border-radius: 999px !important; font-weight: 600 !important; letter-spacing: 0.01em; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.botao:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-1px); }
+.botao:active { transform: translateY(0) scale(0.98); }
+
+.cartao { border-radius: 20px !important; border: 1px solid rgba(11,59,91,0.08) !important; box-shadow: 0 4px 24px rgba(11,59,91,0.06) !important; }
+.cartao:hover { box-shadow: 0 12px 40px rgba(11,59,91,0.12) !important; }
+
+.destaque { border-radius: 24px !important; }
+.faixa { border-radius: 24px !important; }
+
+.entrada, .celular-campo-destaque input, .ph-login-campo input {
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(11,59,91,0.15) !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.entrada:focus, .ph-login-campo input:focus {
+  border-color: var(--azul) !important;
+  box-shadow: 0 0 0 3px rgba(11,59,91,0.1) !important;
+  outline: none !important;
+}
+
+* { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: no-preference) {
+  .cartao, .botao, .chip { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 }
 
 /* ===========================
@@ -2016,6 +1953,112 @@ body.alto-contraste .erro-demo {
   }
   .celular.grande {
     max-width: 420px;
+  }
+}
+
+/* ===========================
+   GEMINI GLASSMORPHISM — identidade futurista minimalista
+   =========================== */
+
+/* Glass panel — vidro fosco */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Aplicar efeito glass aos paineis existentes sem editar TSX */
+.painel-assistente,
+.painel-tela-3d {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Orbe Gemini — circulo com gradiente animado */
+.gemini-orb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--gemini-gradient);
+  animation: gemini-rotate 4s linear infinite;
+  filter: blur(0.5px);
+}
+
+@keyframes gemini-rotate {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Pulso de voz tipo Ok Google — 4 pontos que pulsam */
+.gemini-voice {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.gemini-voice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: gemini-pulse 1.2s ease-in-out infinite;
+}
+
+.gemini-voice-dot:nth-child(1) {
+  background: #4285f4;
+  animation-delay: 0s;
+}
+
+.gemini-voice-dot:nth-child(2) {
+  background: #ea4335;
+  animation-delay: 0.15s;
+}
+
+.gemini-voice-dot:nth-child(3) {
+  background: #fbbc04;
+  animation-delay: 0.3s;
+}
+
+.gemini-voice-dot:nth-child(4) {
+  background: #34a853;
+  animation-delay: 0.45s;
+}
+
+@keyframes gemini-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
+/* Gradiente mesh sutil ao fundo do body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.04;
+  background: radial-gradient(ellipse at 20% 30%, #4285f4 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 70%, #9c27b0 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, #e91e63 0%, transparent 60%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gemini-orb,
+  .gemini-voice-dot {
+    animation: none !important;
   }
 }
 
