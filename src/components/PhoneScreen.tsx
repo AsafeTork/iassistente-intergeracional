@@ -252,33 +252,39 @@ export function PhoneScreen({ onMensagem }: Props) {
       setScanIndex(-1);
       return;
     }
-    setScanIndex(0);
-    const timers: number[] = [];
-    for (let i = 0; i < APPS.length; i++) {
-      timers.push(window.setTimeout(() => setScanIndex(i), 800 + i * 600));
+    setScanIndex(-1);
+    const start = window.setTimeout(() => setScanIndex(0), 600);
+    const timers: number[] = [start];
+    for (let i = 1; i < APPS.length; i++) {
+      timers.push(window.setTimeout(() => setScanIndex(i), 600 + i * 700));
     }
-    timers.push(window.setTimeout(() => setScanIndex(-1), 800 + APPS.length * 600 + 1000));
+    timers.push(window.setTimeout(() => setScanIndex(-1), 600 + APPS.length * 700 + 800));
     return () => timers.forEach(clearTimeout);
   }, [tela]);
 
   function abrirNavegador() {
+    setScanIndex(-1);
     setTela('navegador');
     anunciar('Abrindo o navegador. Agora vou te guiar para o site do Gov.br.');
     setTimeout(() => setTela('govbr'), 1500);
   }
 
   function abrirGovbr() {
+    setScanIndex(-1);
     setTela('login');
     setIndice(0);
+    setValor('');
+    setMostrarErro(false);
     anunciar(`Tela de login do Gov.br. ${PASSOS_GOVBR[0].titulo}. ${PASSOS_GOVBR[0].instrucaoAmigavel}`);
   }
 
   function avancar() {
     setMostrarErro(false);
     if (indice < PASSOS_GOVBR.length - 1) {
-      setIndice(indice + 1);
+      const novo = indice + 1;
+      setIndice(novo);
       setValor('');
-      const proximo = PASSOS_GOVBR[indice + 1];
+      const proximo = PASSOS_GOVBR[novo];
       anunciar(`${proximo.titulo}. ${proximo.instrucaoAmigavel}`);
     } else {
       setTela('concluido');
@@ -320,7 +326,7 @@ export function PhoneScreen({ onMensagem }: Props) {
               }}
             >
               {scanIndex === i ? (
-                <AIScanHighlight delay={0}>
+                <AIScanHighlight delay={0} label="toque aqui">
                   <div className="ph-app-icone-img" style={{ background: app.cor }}>
                     {app.icone}
                   </div>
@@ -364,7 +370,7 @@ export function PhoneScreen({ onMensagem }: Props) {
     return (
       <div className="ph-browser">
         <div className="ph-browser-bar">
-          <AIScanHighlight delay={0.3}>
+          <AIScanHighlight delay={0.3} block>
             <div className="ph-browser-url">
               <span className="ph-browser-lock"><Cadeado /></span>
               <span>gov.br</span>
@@ -374,6 +380,7 @@ export function PhoneScreen({ onMensagem }: Props) {
         <div className="ph-browser-loading">
           <div className="ph-browser-spinner" />
           <span>Carregando gov.br...</span>
+          <button className="ph-browser-cancel" onClick={() => setTela('home')}>Cancelar</button>
         </div>
       </div>
     );
@@ -394,7 +401,7 @@ export function PhoneScreen({ onMensagem }: Props) {
             <strong style={{ display: 'block', fontSize: '0.95rem', color: '#1351B4', lineHeight: 1.2 }}>Acesse sua conta com gov.br</strong>
             <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: '#555', lineHeight: 1.4 }}>Acesse serviços do governo com sua conta gov.br</p>
           </div>
-          <AIScanHighlight delay={0.5} cor="#ffd23f">
+          <AIScanHighlight delay={0.5} cor="#ffd23f" block label="entrar">
             <button className="ph-govbr-btn-entrar" onClick={abrirGovbr}>
               Entrar com Gov.br
             </button>
@@ -464,7 +471,7 @@ export function PhoneScreen({ onMensagem }: Props) {
       </div>
 
       {passo.campo ? (
-        <AIScanHighlight delay={0.2}>
+        <AIScanHighlight delay={0.2} block label={passo.campo.rotulo}>
           <div style={{ margin: '10px 16px', background: '#fff', border: 'none', padding: 0 }}>
             <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#1351B4', marginBottom: 6 }}>{passo.campo.rotulo}</label>
             <input
@@ -504,7 +511,7 @@ export function PhoneScreen({ onMensagem }: Props) {
         <button className="ph-btn ph-btn-secundario" onClick={voltar} disabled={indice === 0}>
           <SetaEsq /> Voltar
         </button>
-        <AIScanHighlight delay={0.4}>
+        <AIScanHighlight delay={0.4} label="continuar">
           <button className="ph-btn ph-btn-primario" onClick={avancar}>
           {indice === PASSOS_GOVBR.length - 1
             ? <><Estrela /> Concluir</>

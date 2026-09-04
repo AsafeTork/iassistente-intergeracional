@@ -30,7 +30,6 @@ function VolumeIcon() {
 export function Demonstracao() {
   const { config } = useAcessibilidade();
   const [mensagem, setMensagem] = useState('Olá! Toque no app Chrome ou Gov.br para começar a demonstração.');
-  const [etapaAtual, setEtapaAtual] = useState(0);
 
   function anunciar(texto: string) {
     falar(texto, config.leituraEmVoz);

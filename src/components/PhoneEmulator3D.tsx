@@ -90,20 +90,20 @@ export function PhoneEmulator3D({ children, mensagem }: Props) {
               {children}
             </div>
 
+            {/* Bolinha de chat dentro da tela */}
+            {mensagem && (
+              <div className="phone-chat-bubble">
+                <div className="phone-chat-dot" />
+                <div className="phone-chat-texto">{mensagem.slice(0, 90)}{mensagem.length > 90 ? '…' : ''}</div>
+              </div>
+            )}
+
             <div className="phone-3d-homebar" />
           </div>
 
           <div className="phone-3d-reflexo" style={estiloReflexo} />
         </div>
       </div>
-
-      {/* Bolinha de chat do assistente */}
-      {mensagem && (
-        <div className="phone-chat-bubble">
-          <div className="phone-chat-dot" />
-          <div className="phone-chat-texto">{mensagem}</div>
-        </div>
-      )}
     </div>
   );
 }
