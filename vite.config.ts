@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'robots.txt', 'icons/*.svg'],
+      includeAssets: ['favicon.svg', 'robots.txt', 'icons/*.svg', 'icons/*.png', 'screenshots/*.png'],
       manifest: {
         name: 'IAssistente Intergeracional',
         short_name: 'IAssistente',
@@ -24,6 +24,24 @@ export default defineConfig({
         theme_color: '#0b3b5b',
         categories: ['accessibility', 'education', 'utilities'],
         icons: [
+          {
+            src: 'icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
           {
             src: 'icons/icon-192.svg',
             sizes: '192x192',
@@ -43,9 +61,41 @@ export default defineConfig({
             purpose: 'maskable',
           },
         ],
+        screenshots: [
+          {
+            src: 'screenshots/screenshot-narrow.png',
+            sizes: '540x960',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Demonstração do IAssistente — visão estreita (mobile)',
+          },
+          {
+            src: 'screenshots/screenshot-wide.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Demonstração do IAssistente — visão ampla (desktop)',
+          },
+        ],
+        shortcuts: [
+          {
+            name: 'Demonstração',
+            short_name: 'Demo',
+            description: 'Ver demonstração interativa do IAssistente',
+            url: '/#/demonstracao',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+          {
+            name: 'Tutoria',
+            short_name: 'Tutoria',
+            description: 'Iniciar tutoria passo a passo',
+            url: '/#/tutoria',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,ico,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: 'index.html',
         runtimeCaching: [
           {

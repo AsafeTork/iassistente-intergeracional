@@ -10,13 +10,6 @@ export type Passo = {
 
 export const PASSOS_GOVBR: Passo[] = [
   {
-    id: 'abrir',
-    titulo: 'Abrir a tela de entrada',
-    instrucaoAmigavel: 'Toque no botão amarelo "Entrar com Gov.br". É o primeiro passo, sem pressa.',
-    detalhe:
-      'O assistente destaca o botão correto na tela e esconde propagandas e menus que confundem.',
-  },
-  {
     id: 'cpf',
     titulo: 'Digitar o CPF',
     instrucaoAmigavel: 'Insira o número do seu CPF no espaço indicado com a borda amarela.',

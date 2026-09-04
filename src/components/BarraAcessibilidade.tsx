@@ -11,7 +11,7 @@ export function BarraAcessibilidade() {
   const { config, alternar } = useAcessibilidade();
 
   return (
-    <section className="barra-acess" aria-label="Opções rápidas de acessibilidade">
+    <section className="barra-acess" aria-label="Opções rápidas de acessibilidade" aria-live="polite">
       {ITENS.map((item) => {
         const ativo = config[item.chave];
         return (

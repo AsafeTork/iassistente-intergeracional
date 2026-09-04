@@ -40,7 +40,9 @@ export function Layout() {
               onClick={() => alternar('leituraEmVoz')}
               title="Ativar ou desativar leitura em voz alta"
             >
-              {config.leituraEmVoz ? '🔊 Voz ligada' : '🔇 Voz desligada'}
+              <span role="status">
+                {config.leituraEmVoz ? '🔊 Voz ligada' : '🔇 Voz desligada'}
+              </span>
             </button>
             <Link to="/demonstracao" className="botao botao-primario">
               Começar agora

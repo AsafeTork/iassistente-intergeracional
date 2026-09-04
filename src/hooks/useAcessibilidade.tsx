@@ -47,6 +47,16 @@ export function ProvedorAcessibilidade({ children }: { children: ReactNode }) {
     document.body.classList.toggle('modo-simples', config.modoSimples);
   }, [config]);
 
+  // Cancela a fala ao desligar a leitura em voz alta.
+  useEffect(() => {
+    if (!config.leituraEmVoz) silenciar();
+  }, [config.leituraEmVoz]);
+
+  // Cancela a fala no unmount do Provedor.
+  useEffect(() => {
+    return () => silenciar();
+  }, []);
+
   const valor = useMemo<Contexto>(
     () => ({
       config,
@@ -62,16 +72,64 @@ export function useAcessibilidade() {
   return useContext(Ctx);
 }
 
+/** Voz pt-BR em cache (getVoices é assíncrono em alguns navegadores). */
+let vozPtBR: SpeechSynthesisVoice | null = null;
+
+function escolherVozPtBR(): SpeechSynthesisVoice | null {
+  try {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+    const vozes = window.speechSynthesis.getVoices();
+    if (!vozes.length) return null;
+    return (
+      vozes.find((v) => v.lang.toLowerCase().startsWith('pt-br')) ??
+      vozes.find((v) => v.lang.toLowerCase().startsWith('pt')) ??
+      null
+    );
+  } catch {
+    return null;
+  }
+}
+
+try {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    vozPtBR = escolherVozPtBR();
+    // As vozes podem carregar depois da primeira chamada: atualiza o cache quando chegarem.
+    window.speechSynthesis.onvoiceschanged = () => {
+      vozPtBR = escolherVozPtBR();
+    };
+  }
+} catch {
+  /* voz indisponível: segue só com o texto visual */
+}
+
+/** Interrompe qualquer fala em andamento. */
+export function silenciar() {
+  try {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  } catch {
+    /* voz indisponível: nada a cancelar */
+  }
+}
+
 /** Fala um texto em pt-BR usando a síntese de voz do dispositivo (quando disponível). */
 export function falar(texto: string, habilitado: boolean) {
   if (!habilitado) return;
   try {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-    const voz = new SpeechSynthesisUtterance(texto);
-    voz.lang = 'pt-BR';
-    voz.rate = 0.95;
-    window.speechSynthesis.speak(voz);
+    const msg = new SpeechSynthesisUtterance(texto);
+    msg.lang = 'pt-BR';
+    msg.rate = 0.95;
+    msg.pitch = 1.0;
+    msg.volume = 1.0;
+    const voz = vozPtBR ?? escolherVozPtBR();
+    if (voz) {
+      msg.voice = voz;
+      msg.lang = voz.lang;
+    }
+    window.speechSynthesis.speak(msg);
   } catch {
     /* voz indisponível: segue só com o texto visual */
   }

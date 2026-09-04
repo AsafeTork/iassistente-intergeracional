@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PASSOS_GOVBR } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { AIScanHighlight } from './AIScanHighlight';
@@ -239,6 +239,7 @@ export function PhoneScreen({ onMensagem }: Props) {
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
   const [scanIndex, setScanIndex] = useState(-1);
+  const navTimer = useRef<number | null>(null);
 
   const passo = PASSOS_GOVBR[indice];
 
@@ -247,26 +248,49 @@ export function PhoneScreen({ onMensagem }: Props) {
     onMensagem?.(texto);
   }
 
+  // Destaca só as ações válidas da home (Gov.br e Chrome), em loop suave.
+  const ALVOS_SCAN = [0, 1];
   useEffect(() => {
     if (tela !== 'home') {
       setScanIndex(-1);
       return;
     }
     setScanIndex(-1);
-    const start = window.setTimeout(() => setScanIndex(0), 600);
-    const timers: number[] = [start];
-    for (let i = 1; i < APPS.length; i++) {
-      timers.push(window.setTimeout(() => setScanIndex(i), 600 + i * 700));
-    }
-    timers.push(window.setTimeout(() => setScanIndex(-1), 600 + APPS.length * 700 + 800));
-    return () => timers.forEach(clearTimeout);
+    const timers: number[] = [];
+    ALVOS_SCAN.forEach((appIdx, k) => {
+      timers.push(window.setTimeout(() => setScanIndex(appIdx), 600 + k * 1200));
+    });
+    const loop = window.setInterval(() => {
+      setScanIndex((atual) => {
+        const pos = ALVOS_SCAN.indexOf(atual);
+        return ALVOS_SCAN[(pos + 1) % ALVOS_SCAN.length];
+      });
+    }, 2400);
+    return () => {
+      timers.forEach(clearTimeout);
+      clearInterval(loop);
+      setScanIndex(-1);
+    };
   }, [tela]);
 
+  useEffect(() => {
+    return () => {
+      if (navTimer.current) clearTimeout(navTimer.current);
+    };
+  }, []);
+
   function abrirNavegador() {
+    if (navTimer.current) clearTimeout(navTimer.current);
     setScanIndex(-1);
     setTela('navegador');
     anunciar('Abrindo o navegador. Agora vou te guiar para o site do Gov.br.');
-    setTimeout(() => setTela('govbr'), 1500);
+    navTimer.current = window.setTimeout(() => setTela('govbr'), 1500);
+  }
+
+  function cancelarNavegador() {
+    if (navTimer.current) clearTimeout(navTimer.current);
+    setTela('home');
+    anunciar('Voltei para a tela inicial. Toque no app Chrome ou Gov.br para começar.');
   }
 
   function abrirGovbr() {
@@ -472,8 +496,10 @@ export function PhoneScreen({ onMensagem }: Props) {
 
       {passo.campo ? (
         <AIScanHighlight delay={0.2} block label={passo.campo.rotulo}>
-          <div style={{ margin: '10px 16px', background: '#fff', border: 'none', padding: 0 }}>
-            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#1351B4', marginBottom: 6 }}>{passo.campo.rotulo}</label>
+          <div className="ph-login-campo--foco" style={{ margin: '10px 16px', background: '#fff', border: 'none', padding: 0 }}>
+            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#1351B4', marginBottom: 6 }}>
+              {passo.campo.tipo === 'cpf' ? 'Digite seu CPF aqui' : passo.campo.rotulo}
+            </label>
             <input
               value={valor}
               onChange={(e) => setValor(e.target.value)}
@@ -481,9 +507,12 @@ export function PhoneScreen({ onMensagem }: Props) {
               inputMode={passo.campo.tipo === 'texto' ? 'text' : 'numeric'}
               type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
               autoComplete="off"
-              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: '1.5px solid #1351B4', fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: '#333', background: '#fff' }}
+              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: '3px solid var(--amarelo)', fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: '#333', background: '#fff' }}
             />
             <small style={{ display: 'block', marginTop: 6, color: '#595959', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
+            <button className="ph-btn ph-btn-primario" onClick={avancar} style={{ marginTop: 10, width: '100%' }}>
+              Enviar
+            </button>
           </div>
         </AIScanHighlight>
       ) : (

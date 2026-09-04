@@ -1,30 +1,53 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+
+type Modo = '3d' | '2d' | 'auto';
 
 type Props = {
   children: ReactNode;
   mensagem?: string;
+  tiltMax?: number;
+  modo?: Modo;
 };
 
-export function PhoneEmulator3D({ children, mensagem }: Props) {
+export function PhoneEmulator3D({ children, mensagem, tiltMax = 8, modo = 'auto' }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [rotacao, setRotacao] = useState({ x: 0, y: 0 });
 
-  const tratarMouseMove = useCallback((e: React.MouseEvent) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setRotacao({ x: y * -12, y: x * 12 });
-  }, []);
+  const tiltDesativado = useMemo(() => {
+    const consideraReduzido =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (consideraReduzido) return true;
+    if (modo === '2d') return true;
+    const ponteiroGrosso =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    if (modo === 'auto' && ponteiroGrosso) return true;
+    return false;
+  }, [modo]);
+
+  const tratarMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (tiltDesativado) return;
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      setRotacao({ x: y * -tiltMax, y: x * tiltMax });
+    },
+    [tiltDesativado, tiltMax]
+  );
 
   const tratarMouseLeave = useCallback(() => {
     setRotacao({ x: 0, y: 0 });
   }, []);
 
-  const estiloTransform = {
-    transform: `perspective(1200px) rotateX(${rotacao.x}deg) rotateY(${rotacao.y}deg)`,
-  };
+  const estiloTransform = tiltDesativado
+    ? { transform: 'none' }
+    : {
+        transform: `perspective(1200px) rotateX(${rotacao.x}deg) rotateY(${rotacao.y}deg)`,
+      };
 
   const estiloSombra = {
     boxShadow: `
@@ -53,6 +76,7 @@ export function PhoneEmulator3D({ children, mensagem }: Props) {
       ref={containerRef}
       onMouseMove={tratarMouseMove}
       onMouseLeave={tratarMouseLeave}
+      style={tiltDesativado ? { touchAction: 'manipulation' } : undefined}
     >
       <div className="phone-3d-perspectiva" style={estiloTransform}>
         <div className="phone-3d-frame" style={estiloSombra}>
@@ -90,7 +114,6 @@ export function PhoneEmulator3D({ children, mensagem }: Props) {
               {children}
             </div>
 
-            {/* Bolinha de chat dentro da tela */}
             {mensagem && (
               <div className="phone-chat-bubble">
                 <div className="phone-chat-dot" />
