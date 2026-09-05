@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SERVICOS_DEMO } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
+import { AIAvatar } from '../components/AIAvatar';
 import { PhoneEmulator3D } from '../components/PhoneEmulator3D';
-import { PhoneScreen } from '../components/PhoneScreen';
+import { PhonePagination } from '../components/PhonePagination';
+import { PhoneScreen, type Tela } from '../components/PhoneScreen';
 
 function RobotIcon() {
   return (
@@ -33,6 +35,8 @@ export function Demonstracao() {
   const [auto, setAuto] = useState(false);
   const [servicoId, setServicoId] = useState('govbr');
   const [sessao, setSessao] = useState(0);
+  const [telaFone, setTelaFone] = useState<Tela>('home');
+  const [salto, setSalto] = useState<{ tela: Tela; n: number }>({ tela: 'home', n: 0 });
 
   function iniciarAuto() {
     setSessao((s) => s + 1);
@@ -87,6 +91,9 @@ export function Demonstracao() {
             <button type="button" className="botao botao-secundario" onClick={() => anunciar(mensagem)}>
               <VolumeIcon /> Ouvir de novo
             </button>
+            {auto && (
+              <span className="etiqueta" role="status"><AIAvatar size="sm" /> gerando ao vivo…</span>
+            )}
           </div>
         </section>
 
@@ -97,9 +104,18 @@ export function Demonstracao() {
               servicoId={servicoId}
               auto={auto}
               onMensagem={setMensagem}
+              onTelaMuda={setTelaFone}
+              salto={salto}
               onAutoFim={() => pararAuto('Pronto! Fiz tudo sozinha — agora tente você, sem pressa.')}
             />
           </PhoneEmulator3D>
+          <PhonePagination
+            telaAtual={telaFone}
+            onTelaChange={(t) => {
+              if (auto) pararAuto();
+              setSalto((s) => ({ tela: t, n: s.n + 1 }));
+            }}
+          />
         </section>
       </div>
 

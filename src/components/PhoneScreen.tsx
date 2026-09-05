@@ -6,6 +6,8 @@ import { NotificacaoAndroid } from './NotificacaoAndroid';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
 
+export type { Tela };
+
 type Props = {
   onMensagem?: (texto: string) => void;
   /** Serviço demonstrado (genérico: Gov.br, SUS...). Padrão: Gov.br. */
@@ -14,6 +16,10 @@ type Props = {
   auto?: boolean;
   /** Chamado ao fim (ou ao cancelar com toque) do modo automático. */
   onAutoFim?: () => void;
+  /** Avisa a tela atual (para a paginação externa). */
+  onTelaMuda?: (tela: Tela) => void;
+  /** Salto de tela vindo da paginação externa. */
+  salto?: { tela: Tela; n: number };
 };
 
 function Bullet() {
@@ -239,11 +245,11 @@ const APPS: { id: string; nome: string; cor: string; icone: ReactNode }[] = [
   { id: 'notas', nome: 'Notas', cor: '#fbbc04', icone: <Notas /> },
 ];
 
-export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onAutoFim }: Props) {
+export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onAutoFim, onTelaMuda, salto }: Props) {
   const { config } = useAcessibilidade();
   const servico: ServicoDemo = SERVICOS_DEMO.find((s) => s.id === servicoId) ?? SERVICOS_DEMO[0];
   const passos = servico.passos;
-  const [tela, setTela] = useState<Tela>('home');
+  const [tela, setTelaEstado] = useState<Tela>('home');
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
@@ -255,6 +261,28 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   autoRef.current = auto;
   const fimRef = useRef(onAutoFim);
   fimRef.current = onAutoFim;
+  const telaMudaRef = useRef(onTelaMuda);
+  telaMudaRef.current = onTelaMuda;
+
+  // Navegação com aviso externo (paginação do mockup).
+  function setTela(t: Tela) {
+    setTelaEstado(t);
+    telaMudaRef.current?.(t);
+  }
+
+  // Salto vindo da paginação externa.
+  const saltoN = salto?.n ?? 0;
+  useEffect(() => {
+    if (saltoN === 0) return;
+    setMostrarErro(false);
+    setNotif('oculta');
+    if (salto?.tela === 'login') {
+      setIndice(0);
+      setValor('');
+    }
+    if (salto) setTela(salto.tela);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saltoN]);
 
   const passo = passos[indice];
 
@@ -512,37 +540,38 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   if (tela === 'govbr') {
     return (
       <div className="ph-govbr" onPointerDownCapture={() => { if (autoRef.current) fimRef.current?.(); }}>
-        <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
-          <GovLogoWhite />
-          <button aria-label="Menu" style={{ background: 'transparent', border: 'none', padding: 4, display: 'flex', cursor: 'pointer' }}>
-            <Hamburger />
+        <header className="ph-govbr-header">
+          <GovLogo />
+          <button className="ph-govbr-menu-btn" aria-label="Abrir menu gov.br">
+            <Hamburger color="#1351b4" />
           </button>
-        </div>
-        <div style={{ height: 2, background: '#FFCD07', flexShrink: 0 }} />
-        <div className="ph-govbr-conteudo">
-          <h3 style={{ margin: '2px 0 8px', fontSize: '0.95rem', color: '#111' }}>Identifique-se no gov.br com:</h3>
-          <div className="ph-govbr-card">
+        </header>
+        <div className="ph-govbr-faixa" aria-hidden="true" />
+        <main className="ph-govbr-conteudo">
+          <h3 className="ph-govbr-titulo">Identifique-se no gov.br com:</h3>
+          <section className="ph-govbr-card" aria-label="Acesso com CPF">
             <strong className="ph-govbr-card-titulo">Número do CPF</strong>
             <p className="ph-govbr-card-ajuda">Digite seu CPF para criar ou acessar sua conta gov.br.</p>
             <AIScanHighlight delay={0.5} cor="#ffd23f" block label="continuar">
-              <button className="ph-govbr-btn-continuar" onClick={abrirGovbr}>
+              <button className="ph-govbr-btn-continuar" onClick={abrirGovbr} aria-label="Continuar com CPF">
                 Continuar
               </button>
             </AIScanHighlight>
-          </div>
+          </section>
           <p className="ph-govbr-outras">Outras opções de identificação:</p>
           <button
             className="ph-govbr-banco"
+            aria-label="Login com seu banco, sua conta será prata"
             onClick={() => anunciar('Login com banco disponível apenas no aplicativo oficial. Aqui, seguimos com o CPF.')}
           >
-            <span className="ph-govbr-banco-icone">🏦</span>
+            <span className="ph-govbr-banco-icone" aria-hidden="true">🏦</span>
             <span>Login com seu banco <small>SUA CONTA SERÁ PRATA</small></span>
           </button>
           <div className="ph-govbr-info">
             <p><Bullet /> Acesse mais de 4.000 serviços</p>
             <p><Bullet /> Segurança garantida</p>
           </div>
-        </div>
+        </main>
       </div>
     );
   }

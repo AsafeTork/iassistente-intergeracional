@@ -18,7 +18,7 @@ describe('camada de voz (RF03)', () => {
     expect(provedorOpenAITTS.disponivel()).toBe(false);
     expect(provedorOpenAITTS.motivoIndisponivel?.()).toContain('OPENAI_API_KEY');
     expect(provedorOpenAIRealtime.disponivel()).toBe(false);
-    expect(provedorOpenAIRealtime.motivoIndisponivel?.()).toContain('WebRTC');
+    expect(provedorOpenAIRealtime.motivoIndisponivel?.()).toContain('backend');
   });
 
   it('provedorAtivo sempre devolve um provedor da lista (fallback seguro)', () => {

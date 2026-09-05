@@ -50,7 +50,7 @@ export function Home() {
 
       <section className="destaque">
         <div className="destaque-texto">
-          <p className="etiqueta">Protótipo • IFPA Bragança • Código aberto</p>
+          <p className="etiqueta">Acessível • Gratuito • Sem instalar</p>
           <h1>
             O celular explica <span className="realce">passo a passo</span>, com voz calma e letra grande.
           </h1>

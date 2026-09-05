@@ -21,10 +21,18 @@
   --glass-bg: rgba(255,255,255,0.08);
   --glass-border: rgba(255,255,255,0.18);
   --glass-blur: blur(20px) saturate(180%);
+  --vidro-bg: rgba(255,255,255,0.12);
+  --vidro-borda: rgba(255,255,255,0.22);
+  --brilho-amarelo: 0 0 30px rgba(255,210,63,0.18);
+  --texto-no-azul: #1c2733;
+  --texto-suave-no-azul: #33404d;
   --gemini-blue: #4285f4;
   --gemini-purple: #9c27b0;
   --gemini-pink: #e91e63;
   --gemini-gradient: linear-gradient(135deg, #4285f4, #9c27b0, #e91e63, #ff9800);
+  --liquid-bg: rgba(255,255,255,0.06);
+  --liquid-border: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05));
+  --liquid-specular: linear-gradient(160deg, rgba(255,255,255,0.15), transparent 40%);
 }
 
 * {
@@ -65,6 +73,96 @@ body {
   backdrop-filter: blur(20px) saturate(170%);
   border: 1px solid var(--vidro-borda);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Liquid Glass — efeito vidro líquido profissional */
+.liquid-glass {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.06) 100%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(1.1);
+  backdrop-filter: blur(24px) saturate(180%) brightness(1.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--raio);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    inset 0 -1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+
+/* Camada especular — reflexo diagonal sutil */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--liquid-specular);
+  opacity: 0.1;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Borda gradiente animada — brilho percorrendo */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(
+    var(--liquid-glow-angle, 135deg),
+    transparent 0%,
+    rgba(255,255,255,0.25) 30%,
+    rgba(255,255,255,0.08) 50%,
+    transparent 70%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  padding: 1px;
+}
+
+.liquid-glass:hover::after {
+  opacity: 1;
+  animation: liquid-glow-sweep 2s ease-in-out infinite;
+}
+
+@keyframes liquid-glow-sweep {
+  0%   { --liquid-glow-angle: 135deg; }
+  50%  { --liquid-glow-angle: 225deg; }
+  100% { --liquid-glow-angle: 135deg; }
+}
+
+@property --liquid-glow-angle {
+  syntax: '<angle>';
+  initial-value: 135deg;
+  inherits: false;
+}
+
+/* Fallback opaco para alto-contraste */
+body.alto-contraste .liquid-glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(20,20,30,0.95);
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: none;
+}
+body.alto-contraste .liquid-glass::before,
+body.alto-contraste .liquid-glass::after {
+  display: none;
+}
+
+/* Desabilitar animação da borda para reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass:hover::after {
+    animation: none;
+    opacity: 0.6;
+  }
 }
 
 /* Ornamento amarelo no topo (efeito) */
@@ -148,7 +246,7 @@ body.alto-contraste .topo {
 .topo-interno {
   max-width: var(--largura);
   margin: 0 auto;
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1.2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -331,6 +429,9 @@ body.alto-contraste .etiqueta {
   position: relative;
   z-index: 1;
 }
+.destaque svg {
+  stroke: #d7e7f5;
+}
 .realce {
   background: var(--amarelo);
   padding: 0 0.3rem;
@@ -362,7 +463,7 @@ body.alto-contraste .etiqueta {
 }
 .botao-primario {
   background: linear-gradient(135deg, var(--amarelo), var(--amarelo-claro));
-  color: var(--azul);
+  color: var(--azul-escuro);
   border-color: var(--amarelo-escuro);
 }
 .botao-primario:hover {
@@ -518,6 +619,15 @@ body.alto-contraste .etiqueta {
 .cartao:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px var(--sombra-azul);
+}
+.cartao.liquid-glass {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--texto);
+}
+.cartao.liquid-glass:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.08) inset;
 }
 body.alto-contraste .cartao {
   border: 2px solid #fff;
@@ -704,6 +814,10 @@ body.alto-contraste .erro-demo {
   * {
     animation: none !important;
     transition: none !important;
+  }
+  .liquid-glass:hover::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
 }
 
@@ -1537,6 +1651,10 @@ body.alto-contraste .erro-demo {
   min-width: 0;
   overflow: hidden;
 }
+.painel-tela-3d.liquid-glass {
+  background: linear-gradient(145deg, rgba(13,13,26,0.85) 0%, rgba(21,21,40,0.8) 50%, rgba(26,26,53,0.85) 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+}
 
 .demo-info-lateral {
   display: grid;
@@ -1550,6 +1668,11 @@ body.alto-contraste .erro-demo {
   border-radius: var(--raio);
   padding: 1.2rem;
   border: 1px solid var(--azul-claro);
+}
+.demo-info-card.liquid-glass {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--texto);
 }
 
 .demo-info-card h3 {
@@ -1687,6 +1810,26 @@ body.alto-contraste .erro-demo {
 }
 @keyframes ai-label-in { 0%{opacity:0; transform:translateX(-50%) translateY(4px)} 100%{opacity:1; transform:translateX(-50%) translateY(0)} }
 
+/* AI Focus — estado ativo (intensificado) */
+.ai-focus--ativo::before {
+  border-color: #ffd23f !important;
+  border-width: 2.5px;
+  box-shadow: 0 0 24px rgba(255, 210, 63, 0.5), 0 0 48px rgba(255, 210, 63, 0.2) !important;
+  opacity: 1 !important;
+}
+.ai-focus-label--ativo {
+  background: #ffd23f !important;
+  color: #1a1a2e !important;
+  box-shadow: 0 0 10px rgba(255, 210, 63, 0.5);
+}
+/* Campo:focus-within intensifica label */
+:focus-within > .ai-focus-label,
+.ai-focus:has(*:focus-within) > .ai-focus-label {
+  background: #ffd23f;
+  color: #1a1a2e;
+  box-shadow: 0 0 10px rgba(255, 210, 63, 0.5);
+}
+
 @media (prefers-reduced-motion: reduce) { .ai-focus::before,.ai-focus-arrow,.ai-focus-label{animation:none !important; opacity:0.8 !important} }
 
 /* ===========================
@@ -1788,6 +1931,74 @@ body.alto-contraste .erro-demo {
   .phone-chat-dot {
     animation: none !important;
     opacity: 1 !important;
+  }
+}
+
+/* ===========================
+   PAGINAÇÃO DO CELULAR (externa)
+   =========================== */
+.ph-pagination {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  width: 100%;
+}
+
+.ph-pagination-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ph-pagination-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease, width 0.2s ease, border-radius 0.2s ease;
+}
+
+.ph-pagination-dot:hover {
+  background: #aaa;
+}
+
+.ph-pagination-dot.ativo {
+  background: #ffd23f;
+  width: 20px;
+  border-radius: 4px;
+}
+
+.ph-pagination-seta {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-suave);
+  transition: opacity 0.2s ease;
+}
+
+.ph-pagination-seta:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.ph-pagination-seta:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph-pagination-dot,
+  .ph-pagination-seta {
+    transition: none !important;
   }
 }
 
@@ -2179,7 +2390,67 @@ body::before {
   }
 }
 
-/* ===== UI fiel gov.br: identifique-se + Continuar + banco ===== */
+/* ===== UI fiel gov.br: identifique-se + Continuar + banco (GovFrame) ===== */
+.ph-govbr {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  font-family: 'Rawline', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: #0c326f;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.ph-govbr-header {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  flex-shrink: 0;
+}
+.ph-govbr-menu-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 8px;
+  color: #1351b4;
+}
+.ph-govbr-menu-btn:hover {
+  background: #f0f4fa;
+}
+.ph-govbr-menu-btn:focus-visible {
+  outline: 3px solid #1351b4;
+  outline-offset: 2px;
+}
+.ph-govbr-faixa {
+  height: 2px;
+  background: #ffcd07;
+  flex-shrink: 0;
+}
+.ph-govbr-conteudo {
+  padding: 16px 16px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ph-govbr-titulo {
+  margin: 2px 0 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #0c326f;
+}
 .ph-govbr-card {
   background: #fff;
   border: 1px solid #dfe3e8;
@@ -2191,7 +2462,8 @@ body::before {
 .ph-govbr-card-titulo {
   display: block;
   font-size: 0.9rem;
-  color: #111;
+  font-weight: 700;
+  color: #0c326f;
 }
 .ph-govbr-card-ajuda {
   margin: 4px 0 10px;
@@ -2201,17 +2473,27 @@ body::before {
 }
 .ph-govbr-btn-continuar {
   width: 100%;
-  min-height: 52px;
+  min-height: 44px;
   border: none;
-  border-radius: 24px;
-  background: #1351b4;
-  color: #fff;
+  border-radius: 100em;
+  background: #ffcd07;
+  color: #0c326f;
   font-weight: 700;
   font-size: 0.95rem;
+  font-family: inherit;
   cursor: pointer;
+  padding: 0.65rem 1.4rem;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 .ph-govbr-btn-continuar:hover {
-  background: #0f438f;
+  background: #eab308;
+}
+.ph-govbr-btn-continuar:active {
+  transform: scale(0.98);
+}
+.ph-govbr-btn-continuar:focus-visible {
+  outline: 3px solid #0c326f;
+  outline-offset: 2px;
 }
 .ph-govbr-outras {
   margin: 12px 0 6px;
@@ -2225,24 +2507,71 @@ body::before {
   align-items: center;
   gap: 10px;
   width: 100%;
+  min-height: 52px;
   padding: 10px 12px;
   background: #fff;
-  border: 1px solid #dfe3e8;
+  border: 1px solid #1351b4;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #111;
+  font-family: inherit;
+  color: #0c326f;
   text-align: left;
+  transition: background-color 0.2s ease;
+}
+.ph-govbr-banco:hover {
+  background: #f0f4fa;
+}
+.ph-govbr-banco:focus-visible {
+  outline: 3px solid #1351b4;
+  outline-offset: 2px;
 }
 .ph-govbr-banco small {
   display: block;
   font-weight: 400;
   color: #555;
   font-size: 0.62rem;
+  letter-spacing: 0.02em;
 }
 .ph-govbr-banco-icone {
   font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.ph-govbr-info {
+  background: #eaf2ff;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ph-govbr-info p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #0c326f;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+@media (max-width: 320px) {
+  .ph-govbr {
+    max-width: 100%;
+  }
+  .ph-govbr-conteudo {
+    padding: 12px 12px 16px;
+  }
+  .ph-govbr-titulo {
+    font-size: 0.88rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ph-govbr-btn-continuar,
+  .ph-govbr-banco,
+  .ph-govbr-menu-btn {
+    transition: none !important;
+  }
 }
 
 /* ===== Erro estilo portal gov.br ===== */
