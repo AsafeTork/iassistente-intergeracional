@@ -541,38 +541,11 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   if (tela === 'govbr') {
     return (
       <div className="ph-govbr" onPointerDownCapture={() => { if (autoRef.current) fimRef.current?.(); }}>
-        <header className="ph-govbr-header">
-          <GovLogo />
-          <button className="ph-govbr-menu-btn" aria-label="Abrir menu gov.br">
-            <Hamburger color="#1351b4" />
-          </button>
-        </header>
-        <div className="ph-govbr-faixa" aria-hidden="true" />
-        <main className="ph-govbr-conteudo">
-          <h3 className="ph-govbr-titulo">Identifique-se no gov.br com:</h3>
-          <section className="ph-govbr-card" aria-label="Acesso com CPF">
-            <strong className="ph-govbr-card-titulo">Número do CPF</strong>
-            <p className="ph-govbr-card-ajuda">Digite seu CPF para criar ou acessar sua conta gov.br.</p>
-            <AIScanHighlight delay={0.5} cor="#ffd23f" block label="continuar">
-              <button className="ph-govbr-btn-continuar" onClick={abrirGovbr} aria-label="Continuar com CPF">
-                Continuar
-              </button>
-            </AIScanHighlight>
-          </section>
-          <p className="ph-govbr-outras">Outras opções de identificação:</p>
-          <button
-            className="ph-govbr-banco"
-            aria-label="Login com seu banco, sua conta será prata"
-            onClick={() => anunciar('Login com banco disponível apenas no aplicativo oficial. Aqui, seguimos com o CPF.')}
-          >
-            <span className="ph-govbr-banco-icone" aria-hidden="true">🏦</span>
-            <span>Login com seu banco <small>SUA CONTA SERÁ PRATA</small></span>
-          </button>
-          <div className="ph-govbr-info">
-            <p><Bullet /> Acesse mais de 4.000 serviços</p>
-            <p><Bullet /> Segurança garantida</p>
-          </div>
-        </main>
+        <GovFrame onAvancar={abrirGovbr} onMensagem={anunciar} />
+        <div className="ph-govbr-info">
+          <p><Bullet /> Acesse mais de 4.000 serviços</p>
+          <p><Bullet /> Segurança garantida</p>
+        </div>
       </div>
     );
   }
