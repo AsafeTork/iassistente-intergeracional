@@ -469,7 +469,7 @@ body.alto-contraste .cartao {
   box-shadow: none;
 }
 .cartao-cat {
-  color: var(--azul-claro);
+  color: var(--azul-medio);
   font-weight: 700;
   margin: 0;
   text-transform: uppercase;
@@ -481,7 +481,7 @@ body.alto-contraste .cartao {
   margin: 0;
 }
 .cartao-link {
-  color: var(--azul-claro);
+  color: var(--azul-medio);
   font-weight: 700;
 }
 .cartao ul {
