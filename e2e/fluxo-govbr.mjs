@@ -17,9 +17,11 @@ const check = (cond, nome) => {
 
 await page.goto(BASE, { waitUntil: 'networkidle' });
 await page.locator('.ph-app-icone', { hasText: 'Chrome' }).click();
-await page.locator('.ph-govbr-btn-continuar').waitFor({ timeout: 8000 });
+await page.locator('.govframe-hotspot').first().waitFor({ timeout: 8000 });
 await shot('01-govbr');
-await page.locator('.ph-govbr-btn-continuar').click();
+await page.locator('.govframe-hotspot').first().click();
+await page.waitForTimeout(500);
+await page.locator('.govframe-hotspot').first().click();
 
 // Passo CPF: preenche, envia, testa erro simulado, avança
 await page.locator('.ph-login-campo--foco input').fill('12345678900');

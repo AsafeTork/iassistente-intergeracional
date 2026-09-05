@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { SERVICOS_DEMO, type ServicoDemo } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { AIScanHighlight } from './AIScanHighlight';
+import { GovFrame } from './GovFrame';
 import { NotificacaoAndroid } from './NotificacaoAndroid';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
