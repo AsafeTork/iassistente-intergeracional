@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
+import { NUNCA_SAI, PODE_SAIR, higienizarDOM } from '../lib/filtroPrivacidade';
+
+const EXEMPLO_BRUTO = `<input name="cpf" value="123.456.789-00" />\n<input type="password" value="minha-senha" />\n<button>Entrar com Gov.br</button>`;
 
 export function Privacidade() {
+  const demo = useMemo(() => higienizarDOM(EXEMPLO_BRUTO), []);
   return (
     <div>
       <p className="migalha">
@@ -39,25 +44,19 @@ export function Privacidade() {
       </div>
 
       <section className="secao" aria-label="Demonstração do filtro">
-        <h2>Veja o filtro trabalhando (simulação)</h2>
+        <h2>Veja o filtro trabalhando (de verdade, neste aparelho)</h2>
+        <p className="secao-sub">
+          O exemplo abaixo passa pelo <strong>mesmo código</strong> que protege o app
+          ({demo.removidos} campos removidos: {demo.categorias.join(', ')}).
+        </p>
         <div className="filtro-demo">
           <div>
-            <h3>Antes (higienizado)</h3>
-            <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="var(--verde)" style={{marginRight: 4, verticalAlign: 'middle'}}>
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span style={{color: 'var(--verde)', fontSize: '0.8rem', verticalAlign: 'middle'}}>[REMOVIDO]</span>
-            <span style={{color: 'var(--verde)', fontSize: '0.7rem', verticalAlign: 'middle' }}>seguro</span>
-            <pre>{`<input name="cpf" value="[REMOVIDO]" />\n<input type="password" value="[REMOVIDO]" />\n<button>Entrar com Gov.br</button>`}</pre>
+            <h3>Antes (tela bruta — nunca sai)</h3>
+            <pre>{EXEMPLO_BRUTO}</pre>
           </div>
           <div>
             <h3>Depois (higienizado → nuvem)</h3>
-            <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="var(--verde)" style={{marginRight: 4, verticalAlign: 'middle'}}>
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span style={{color: 'var(--verde)', fontSize: '0.8rem', verticalAlign: 'middle'}}>[REMOVIDO]</span>
-            <span style={{color: 'var(--verde)', fontSize: '0.7rem', verticalAlign: 'middle' }}>seguro</span>
-            <pre>{`<input name="cpf" value="[REMOVIDO]" />\n<input type="password" value="[REMOVIDO]" />\n<button>Entrar com Gov.br</button>`}</pre>
+            <pre>{demo.higienizado}</pre>
           </div>
         </div>
       </section>

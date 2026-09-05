@@ -39,9 +39,38 @@ body {
   margin: 0;
   font-family: var(--fonte);
   background: var(--fundo-degradado);
-  color: var(--texto);
+  background-attachment: fixed;
+  color: var(--texto-no-azul);
+  --texto: var(--texto-no-azul);
+  --texto-suave: var(--texto-suave-no-azul);
   line-height: 1.6;
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Superfícies claras (cartões) mantêm texto escuro via escopo de variáveis */
+.cartao,
+.painel-assistente,
+.demo-info-card,
+.filtro-demo > div,
+.painel-tela {
+  --texto: #1c2733;
+  --texto-suave: #33404d;
+  color: var(--texto);
+}
+
+/* Liquid glass: base fosca para os elementos sobre o azul */
+.glass {
+  background: var(--vidro-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid var(--vidro-borda);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Ornamento amarelo no topo (efeito) */
+.topo {
+  border-bottom: 2px solid rgba(255, 210, 63, 0.65);
+  box-shadow: 0 4px 24px rgba(255, 210, 63, 0.15);
 }
 
 /* Acessibilidade global */
@@ -224,7 +253,7 @@ h1 {
   color: var(--texto-suave);
 }
 .migalha a {
-  color: var(--azul-medio);
+  color: var(--amarelo-claro);
 }
 .etiqueta {
   display: inline-block;
@@ -271,10 +300,36 @@ body.alto-contraste .etiqueta {
   grid-template-columns: 1.4fr 1fr;
   gap: 1.5rem;
   align-items: center;
-  background: var(--cartao);
+  --texto-no-azul: #f2f8ff;
+  --texto-suave-no-azul: #d7e7f5;
+  --texto: var(--texto-no-azul);
+  --texto-suave: var(--texto-suave-no-azul);
+  color: var(--texto);
+  background:
+    radial-gradient(500px 260px at 90% 10%, rgba(255, 210, 63, 0.28), transparent 65%),
+    linear-gradient(140deg, rgba(6, 45, 69, 0.92), rgba(11, 59, 91, 0.88));
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid var(--vidro-borda);
   border-radius: var(--raio);
   padding: 1.6rem;
-  box-shadow: 0 4px 20px var(--sombra-azul);
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.45), var(--brilho-amarelo), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+.destaque::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -110px;
+  top: -110px;
+  background: radial-gradient(circle, rgba(255, 210, 63, 0.35), transparent 70%);
+  pointer-events: none;
+}
+.destaque > * {
+  position: relative;
+  z-index: 1;
 }
 .realce {
   background: var(--amarelo);
@@ -846,21 +901,7 @@ body.alto-contraste .erro-demo {
   flex-shrink: 0;
 }
 
-.phone-3d-homebar::after {
-  content: '';
-  width: 110px;
-  height: 4px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 4px;
-}
-
-/* Reflexo de vidro */
 .phone-3d-reflexo {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
   border-radius: 36px;
   pointer-events: none;
   z-index: 15;
@@ -2136,4 +2177,210 @@ body::before {
   .celular.grande {
     max-width: 420px;
   }
+}
+
+/* ===== UI fiel gov.br: identifique-se + Continuar + banco ===== */
+.ph-govbr-card {
+  background: #fff;
+  border: 1px solid #dfe3e8;
+  border-top: 4px solid #1351b4;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.ph-govbr-card-titulo {
+  display: block;
+  font-size: 0.9rem;
+  color: #111;
+}
+.ph-govbr-card-ajuda {
+  margin: 4px 0 10px;
+  font-size: 0.7rem;
+  color: #555;
+  line-height: 1.4;
+}
+.ph-govbr-btn-continuar {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 24px;
+  background: #1351b4;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.ph-govbr-btn-continuar:hover {
+  background: #0f438f;
+}
+.ph-govbr-outras {
+  margin: 12px 0 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+}
+.ph-govbr-banco {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111;
+  text-align: left;
+}
+.ph-govbr-banco small {
+  display: block;
+  font-weight: 400;
+  color: #555;
+  font-size: 0.62rem;
+}
+.ph-govbr-banco-icone {
+  font-size: 1.3rem;
+}
+
+/* ===== Erro estilo portal gov.br ===== */
+.ph-login-erro-portal {
+  background: #fce8e6 !important;
+  border: 1px solid #b3261e !important;
+  color: #b3261e !important;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.ph-login-erro-assistente {
+  background: #e6f4ea !important;
+  border: 1px solid #1d7a3a !important;
+  color: #134e2a !important;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  margin-top: 8px;
+}
+
+/* ===== Notificação estilo Android ===== */
+.phone-3d-conteudo {
+  position: relative;
+}
+.ph-notif-pip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 16px);
+  margin: 8px 8px 0;
+  padding: 8px 10px;
+  background: rgba(20, 20, 22, 0.92);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  text-align: left;
+  animation: ph-notif-entra 0.4s ease;
+  z-index: 5;
+}
+@keyframes ph-notif-entra {
+  from { transform: translateY(-120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.ph-notif-pip-app {
+  background: #25d366;
+  color: #062d45;
+  font-weight: 800;
+  font-size: 0.55rem;
+  border-radius: 6px;
+  padding: 2px 5px;
+  flex-shrink: 0;
+}
+.ph-notif-shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 20, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 20;
+  padding: 12px 10px;
+  border-radius: 0 0 18px 18px;
+  animation: ph-notif-entra 0.3s ease;
+}
+.ph-notif-shade-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.ph-notif-fechar {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.ph-notif-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+}
+.ph-notif-card-app {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.62rem;
+  color: #555;
+  font-weight: 700;
+}
+.ph-notif-card-texto {
+  font-size: 0.75rem;
+  color: #111;
+  margin: 8px 0 10px;
+  line-height: 1.45;
+}
+.ph-notif-usar {
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  border-radius: 10px;
+  background: var(--amarelo);
+  color: #111;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ===== Demonstração: modo auto + seletor de serviço ===== */
+.acoes-linha {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 1rem 0;
+}
+.demo-servico {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+.demo-servico select {
+  min-height: 52px;
+  border-radius: 12px;
+  border: 2px solid var(--azul);
+  background: #fff;
+  color: var(--azul);
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
 }

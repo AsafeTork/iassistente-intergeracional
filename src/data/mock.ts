@@ -80,8 +80,46 @@ export const TUTORES: Tutor[] = [
   { id: 't3', nome: 'Mariana Silva', idade: 15, escola: 'E. E. Luiz Paulino Mártires', especialidade: 'Banco e boletos', avaliacao: 5.0 },
 ];
 
-export const REQUISITOS = {
-  funcionais: [
+/** Serviço genérico: a demo serve para qualquer portal, não só Gov.br. */
+export type ServicoDemo = {
+  id: string;
+  nome: string;
+  portal: string;
+  codigoSMS: string;
+  passos: Passo[];
+};
+
+export const PASSOS_SUS: Passo[] = [
+  {
+    id: 'cartao',
+    titulo: 'Digitar o cartão SUS',
+    instrucaoAmigavel: 'Digite os 15 números do seu cartão do SUS no espaço amarelo.',
+    detalhe: 'Só números. O cartão fica atrás da carteirinha amarela do SUS.',
+    campo: { rotulo: 'Cartão SUS', exemplo: '898 1234 5678 9012', tipo: 'texto' },
+    erroTecnico: 'Cartão não encontrado na base.',
+    erroAmigavel: 'Não achei esse cartão. Vamos conferir número por número, sem pressa.',
+  },
+  {
+    id: 'data',
+    titulo: 'Escolher o dia',
+    instrucaoAmigavel: 'Toque no dia que você quer ir ao posto de saúde.',
+    detalhe: 'Dias verdes têm vaga. O assistente sugere o mais próximo.',
+    campo: { rotulo: 'Dia da consulta', exemplo: 'quinta, dia 12', tipo: 'texto' },
+  },
+  {
+    id: 'pronto',
+    titulo: 'Pronto! Consulta marcada',
+    instrucaoAmigavel: 'Parabéns! Sua consulta está marcada. Chegue 30 minutos antes.',
+    detalhe: 'O comprovante fica salvo para mostrar na recepção.',
+  },
+];
+
+export const SERVICOS_DEMO: ServicoDemo[] = [
+  { id: 'govbr', nome: 'Gov.br', portal: 'gov.br', codigoSMS: '482 916', passos: PASSOS_GOVBR },
+  { id: 'sus', nome: 'Agendar SUS', portal: 'sus.agenda', codigoSMS: '310 742', passos: PASSOS_SUS },
+];
+
+export const REQUISITOS = {  funcionais: [
     { codigo: 'RF01', texto: 'Extrair e interpretar a árvore DOM de páginas web ativas' },
     { codigo: 'RF02', texto: 'Traduzir termos burocráticos com PNL adaptativa' },
     { codigo: 'RF03', texto: 'Feedback multimodal: síntese de voz + realce visual de elementos' },

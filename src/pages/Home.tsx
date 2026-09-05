@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { BarraAcessibilidade } from '../components/BarraAcessibilidade';
+import { MockupFalante } from '../components/MockupFalante';
 import { SERVICOS } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 
@@ -80,15 +81,7 @@ export function Home() {
         </div>
 
         <div className="destaque-mock" aria-label="Exemplo da interface assistiva">
-          <div className="celular">
-            <p className="celular-topo">ENTRAR COM GOV.BR</p>
-            <div className="celular-campo-destaque">
-              <label htmlFor="demo-cpf">Digite seu CPF aqui</label>
-              <input id="demo-cpf" placeholder="123.456.789-00" inputMode="numeric" readOnly value="" />
-            </div>
-            <p className="celular-fala">"Insira o número do seu CPF no espaço com a borda amarela."</p>
-            <span className="celular-botao">Enviar</span>
-          </div>
+          <MockupFalante />
         </div>
       </section>
 

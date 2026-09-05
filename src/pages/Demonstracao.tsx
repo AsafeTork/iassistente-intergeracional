@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PASSOS_GOVBR } from '../data/mock';
+import { SERVICOS_DEMO } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { PhoneEmulator3D } from '../components/PhoneEmulator3D';
 import { PhoneScreen } from '../components/PhoneScreen';
@@ -30,6 +30,20 @@ function VolumeIcon() {
 export function Demonstracao() {
   const { config } = useAcessibilidade();
   const [mensagem, setMensagem] = useState('Olá! Toque no app Chrome ou Gov.br para começar a demonstração.');
+  const [auto, setAuto] = useState(false);
+  const [servicoId, setServicoId] = useState('govbr');
+  const [sessao, setSessao] = useState(0);
+
+  function iniciarAuto() {
+    setSessao((s) => s + 1);
+    setMensagem('Assista: vou fazer tudo sozinha, do início ao fim. Toque no celular para assumir.');
+    setAuto(true);
+  }
+
+  function pararAuto(msg = 'Você assumiu o controle. Continue de onde parou, sem pressa.') {
+    setAuto(false);
+    setMensagem(msg);
+  }
 
   function anunciar(texto: string) {
     falar(texto, config.leituraEmVoz);
@@ -42,8 +56,28 @@ export function Demonstracao() {
       </p>
       <h1>Demonstração interativa</h1>
       <p className="subtitulo">
-        Use o celular 3D como se fosse real — abra o navegador, acesse o Gov.br e siga o passo a passo.
+        Use o celular 3D como se fosse real — ou aperte <strong>Ver sozinho</strong> e
+        assista a IA fazer tudo, como se estivesse gerando a solução naquele momento.
       </p>
+      <div className="acoes-linha" role="group" aria-label="Opções da demonstração">
+        {!auto ? (
+          <button type="button" className="botao botao-primario" onClick={iniciarAuto}>
+            ▶ Ver sozinho (automático)
+          </button>
+        ) : (
+          <button type="button" className="botao botao-aviso" onClick={() => pararAuto()}>
+            ■ Parar e assumir
+          </button>
+        )}
+        <label className="demo-servico">
+          Serviço:
+          <select value={servicoId} onChange={(e) => { setServicoId(e.target.value); setAuto(false); }} aria-label="Escolher serviço demonstrado">
+            {SERVICOS_DEMO.map((s) => (
+              <option key={s.id} value={s.id}>{s.nome}</option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <div className="demo-3d-area">
         <section className="painel-assistente" aria-live="polite" aria-label="Assistente">
@@ -58,7 +92,13 @@ export function Demonstracao() {
 
         <section className="painel-tela-3d" aria-label="Emulador 3D do celular">
           <PhoneEmulator3D mensagem={mensagem}>
-            <PhoneScreen onMensagem={setMensagem} />
+            <PhoneScreen
+              key={`${servicoId}-${sessao}`}
+              servicoId={servicoId}
+              auto={auto}
+              onMensagem={setMensagem}
+              onAutoFim={() => pararAuto('Pronto! Fiz tudo sozinha — agora tente você, sem pressa.')}
+            />
           </PhoneEmulator3D>
         </section>
       </div>

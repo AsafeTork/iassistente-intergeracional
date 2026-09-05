@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { PASSOS_GOVBR } from '../data/mock';
+import { SERVICOS_DEMO, type ServicoDemo } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { AIScanHighlight } from './AIScanHighlight';
+import { NotificacaoAndroid } from './NotificacaoAndroid';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
 
 type Props = {
   onMensagem?: (texto: string) => void;
+  /** Serviço demonstrado (genérico: Gov.br, SUS...). Padrão: Gov.br. */
+  servicoId?: string;
+  /** Modo automático: abre o app e avança as etapas sozinho. */
+  auto?: boolean;
+  /** Chamado ao fim (ou ao cancelar com toque) do modo automático. */
+  onAutoFim?: () => void;
 };
 
 function Bullet() {
@@ -232,21 +239,113 @@ const APPS: { id: string; nome: string; cor: string; icone: ReactNode }[] = [
   { id: 'notas', nome: 'Notas', cor: '#fbbc04', icone: <Notas /> },
 ];
 
-export function PhoneScreen({ onMensagem }: Props) {
+export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onAutoFim }: Props) {
   const { config } = useAcessibilidade();
+  const servico: ServicoDemo = SERVICOS_DEMO.find((s) => s.id === servicoId) ?? SERVICOS_DEMO[0];
+  const passos = servico.passos;
   const [tela, setTela] = useState<Tela>('home');
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
   const [scanIndex, setScanIndex] = useState(-1);
+  const [notif, setNotif] = useState<'oculta' | 'pip' | 'aberta'>('oculta');
   const navTimer = useRef<number | null>(null);
+  const autoTimers = useRef<number[]>([]);
+  const autoRef = useRef(auto);
+  autoRef.current = auto;
+  const fimRef = useRef(onAutoFim);
+  fimRef.current = onAutoFim;
 
-  const passo = PASSOS_GOVBR[indice];
+  const passo = passos[indice];
 
   function anunciar(texto: string) {
     falar(texto, config.leituraEmVoz);
     onMensagem?.(texto);
   }
+
+  function limparAuto() {
+    autoTimers.current.forEach((t) => window.clearTimeout(t));
+    autoTimers.current = [];
+  }
+
+  // Modo automático: abre o app e conduz até o fim sozinho (qualquer toque cancela).
+  useEffect(() => {
+    if (!auto) {
+      limparAuto();
+      return;
+    }
+    const agenda = (fn: () => void, ms: number) => {
+      autoTimers.current.push(window.setTimeout(() => {
+        if (autoRef.current) fn();
+      }, ms));
+    };
+    const avancarPara = (i: number) => {
+      setMostrarErro(false);
+      setNotif('oculta');
+      if (i < passos.length - 1) {
+        setIndice(i + 1);
+        setValor('');
+        const proximo = passos[i + 1];
+        anunciar(`${proximo.titulo}. ${proximo.instrucaoAmigavel}`);
+      } else {
+        setTela('concluido');
+        anunciar(`Parabéns! Você concluiu ${servico.nome} com sucesso!`);
+      }
+    };
+    agenda(() => abrirNavegador(), 1200);
+    agenda(() => abrirGovbr(), 3600);
+    let t = 5600;
+    passos.forEach((p, i) => {
+      if (i === 0 && p.erroAmigavel) {
+        // Erro real simulado na UI exata, com tradução acolhedora em seguida.
+        agenda(() => {
+          setValor(p.campo?.exemplo ?? '');
+          setMostrarErro(true);
+          anunciar(p.erroAmigavel ?? '');
+        }, t);
+        agenda(() => avancarPara(i), t + 3200);
+        t += 3400;
+      }
+      if (p.campo?.tipo === 'codigo') {
+        agenda(() => {
+          setValor('');
+          setNotif('pip');
+          anunciar(`Chegou uma mensagem com o código. Arraste de cima para baixo para abrir as notificações.`);
+        }, t);
+        agenda(() => {
+          setNotif('aberta');
+          anunciar(`Aqui está o código, gerado agora para você. Toque em Usar este código.`);
+        }, t + 2600);
+        agenda(() => {
+          setValor(servico.codigoSMS);
+          setNotif('oculta');
+          anunciar(`Código preenchido: ${servico.codigoSMS}. Agora toque em Enviar.`);
+        }, t + 4600);
+        agenda(() => avancarPara(i), t + 6600);
+        t += 6800;
+      } else if (!(i === 0 && p.erroAmigavel)) {
+        agenda(() => setValor(p.campo?.exemplo ?? ''), t);
+        agenda(() => avancarPara(i), t + 2200);
+        t += 2400;
+      } else {
+        t += 0;
+      }
+    });
+    agenda(() => fimRef.current?.(), t + 2500);
+    return () => limparAuto();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, servicoId]);
+
+  // No modo manual, o SMS chega sozinho quando o passo do código aparece.
+  useEffect(() => {
+    if (auto || notif !== 'oculta' || passo?.campo?.tipo !== 'codigo') return;
+    const t = window.setTimeout(() => {
+      setNotif('pip');
+      anunciar(`Chegou uma mensagem com o código. Toque na notificação lá em cima para abrir.`);
+    }, 1500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [indice, tela]);
 
   // Destaca só as ações válidas da home (Gov.br e Chrome), em loop suave.
   const ALVOS_SCAN = [0, 1];
@@ -299,20 +398,20 @@ export function PhoneScreen({ onMensagem }: Props) {
     setIndice(0);
     setValor('');
     setMostrarErro(false);
-    anunciar(`Tela de login do Gov.br. ${PASSOS_GOVBR[0].titulo}. ${PASSOS_GOVBR[0].instrucaoAmigavel}`);
+    anunciar(`Tela de login: ${servico.nome}. ${passos[0].titulo}. ${passos[0].instrucaoAmigavel}`);
   }
 
   function avancar() {
     setMostrarErro(false);
-    if (indice < PASSOS_GOVBR.length - 1) {
+    if (indice < passos.length - 1) {
       const novo = indice + 1;
       setIndice(novo);
       setValor('');
-      const proximo = PASSOS_GOVBR[novo];
+      const proximo = passos[novo];
       anunciar(`${proximo.titulo}. ${proximo.instrucaoAmigavel}`);
     } else {
       setTela('concluido');
-      anunciar('Parabéns! Você entrou com sucesso no Gov.br!');
+      anunciar(`Parabéns! Você concluiu ${servico.nome} com sucesso!`);
     }
   }
 
@@ -412,7 +511,7 @@ export function PhoneScreen({ onMensagem }: Props) {
 
   if (tela === 'govbr') {
     return (
-      <div className="ph-govbr">
+      <div className="ph-govbr" onPointerDownCapture={() => { if (autoRef.current) fimRef.current?.(); }}>
         <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
           <GovLogoWhite />
           <button aria-label="Menu" style={{ background: 'transparent', border: 'none', padding: 4, display: 'flex', cursor: 'pointer' }}>
@@ -421,19 +520,27 @@ export function PhoneScreen({ onMensagem }: Props) {
         </div>
         <div style={{ height: 2, background: '#FFCD07', flexShrink: 0 }} />
         <div className="ph-govbr-conteudo">
-          <div style={{ background: '#fff', borderLeft: '4px solid #1351B4', padding: '12px 14px', borderRadius: 4, boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}>
-            <strong style={{ display: 'block', fontSize: '0.95rem', color: '#1351B4', lineHeight: 1.2 }}>Acesse sua conta com gov.br</strong>
-            <p style={{ margin: '4px 0 0', fontSize: '0.7rem', color: '#555', lineHeight: 1.4 }}>Acesse serviços do governo com sua conta gov.br</p>
+          <h3 style={{ margin: '2px 0 8px', fontSize: '0.95rem', color: '#111' }}>Identifique-se no gov.br com:</h3>
+          <div className="ph-govbr-card">
+            <strong className="ph-govbr-card-titulo">Número do CPF</strong>
+            <p className="ph-govbr-card-ajuda">Digite seu CPF para criar ou acessar sua conta gov.br.</p>
+            <AIScanHighlight delay={0.5} cor="#ffd23f" block label="continuar">
+              <button className="ph-govbr-btn-continuar" onClick={abrirGovbr}>
+                Continuar
+              </button>
+            </AIScanHighlight>
           </div>
-          <AIScanHighlight delay={0.5} cor="#ffd23f" block label="entrar">
-            <button className="ph-govbr-btn-entrar" onClick={abrirGovbr}>
-              Entrar com Gov.br
-            </button>
-          </AIScanHighlight>
+          <p className="ph-govbr-outras">Outras opções de identificação:</p>
+          <button
+            className="ph-govbr-banco"
+            onClick={() => anunciar('Login com banco disponível apenas no aplicativo oficial. Aqui, seguimos com o CPF.')}
+          >
+            <span className="ph-govbr-banco-icone">🏦</span>
+            <span>Login com seu banco <small>SUA CONTA SERÁ PRATA</small></span>
+          </button>
           <div className="ph-govbr-info">
             <p><Bullet /> Acesse mais de 4.000 serviços</p>
             <p><Bullet /> Segurança garantida</p>
-            <p><Bullet /> Use CPF e senha</p>
           </div>
         </div>
       </div>
@@ -445,7 +552,7 @@ export function PhoneScreen({ onMensagem }: Props) {
       <div className="ph-sucesso">
         <div className="ph-sucesso-icone"><Estrela /></div>
         <h3>Conta aberta!</h3>
-        <p>Você acessou o Gov.br com sucesso.</p>
+        <p>Você concluiu {servico.nome} com sucesso.</p>
         <AIScanHighlight delay={0.5} cor="#1d7a3a">
           <button className="ph-btn ph-btn-primario" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
             Voltar ao início
@@ -455,10 +562,27 @@ export function PhoneScreen({ onMensagem }: Props) {
     );
   }
 
-  const progresso = Math.round(((indice + 1) / PASSOS_GOVBR.length) * 100);
+  const progresso = Math.round(((indice + 1) / passos.length) * 100);
 
   return (
-    <div className="ph-login">
+    <div className="ph-login" onPointerDownCapture={() => { if (autoRef.current) fimRef.current?.(); }}>
+      {notif !== 'oculta' && (
+        <NotificacaoAndroid
+          remetente={servico.id === 'govbr' ? 'Gov.br' : 'SUS Digital'}
+          codigo={servico.codigoSMS}
+          aberta={notif === 'aberta'}
+          onAbrir={() => {
+            setNotif('aberta');
+            anunciar(`Aqui está o código, gerado agora para você. Toque em Usar este código.`);
+          }}
+          onUsarCodigo={() => {
+            setValor(servico.codigoSMS);
+            setNotif('oculta');
+            anunciar(`Código preenchido. Agora toque em Enviar, sem pressa.`);
+          }}
+          onFechar={() => setNotif('pip')}
+        />
+      )}
       <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button onClick={() => setTela('govbr')} aria-label="Voltar" style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 4, color: '#fff' }}>
@@ -482,11 +606,11 @@ export function PhoneScreen({ onMensagem }: Props) {
         <div className="ph-login-progresso-fill" style={{ width: `${progresso}%` }} />
       </div>
       <div className="ph-login-passo-texto">
-        Passo {indice + 1} de {PASSOS_GOVBR.length}
+        Passo {indice + 1} de {passos.length}
       </div>
 
       <div className="ph-login-dots">
-        {PASSOS_GOVBR.map((p, i) => (
+        {passos.map((p, i) => (
           <span
             key={p.id}
             className={`ph-login-dot ${i === indice ? 'atual' : i < indice ? 'feito' : ''}`}
@@ -517,7 +641,7 @@ export function PhoneScreen({ onMensagem }: Props) {
         </AIScanHighlight>
       ) : (
         <div className="ph-login-info">
-          {indice === PASSOS_GOVBR.length - 1
+          {indice === passos.length - 1
             ? <><Estrela /> Conta aberta com sucesso!</>
             : 'Toque em "Continuar" para avançar.'}
         </div>
@@ -542,7 +666,7 @@ export function PhoneScreen({ onMensagem }: Props) {
         </button>
         <AIScanHighlight delay={0.4} label="continuar">
           <button className="ph-btn ph-btn-primario" onClick={avancar}>
-          {indice === PASSOS_GOVBR.length - 1
+          {indice === passos.length - 1
             ? <><Estrela /> Concluir</>
             : <>Continuar <SetaDir /></>}
           </button>
