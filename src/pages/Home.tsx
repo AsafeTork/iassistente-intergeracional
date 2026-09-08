@@ -76,14 +76,12 @@ export function Home() {
 
       <section className="destaque" aria-labelledby="tit-hero">
         <div className="destaque-texto">
-          <p className="etiqueta anim-hero anim-hero-1">Gov.br • Acessível • Gratuito • Sem instalar</p>
+          <p className="etiqueta anim-hero anim-hero-1">Gov.br • Acessível • Gratuito</p>
           <h1 id="tit-hero" className="anim-hero anim-hero-2">
-            O celular explica <span className="realce">passo a passo</span>, com voz calma e letra grande.
+            O celular explica <span className="realce">passo a passo</span>
           </h1>
           <p className="subtitulo anim-hero anim-hero-3">
-            O <strong>IAssistente Intergeracional</strong> ajuda idosos e pessoas com dificuldade visual a
-            usar portais como o <strong>Gov.br</strong> sozinhos: destaca onde tocar, traduz palavras
-            difíceis e transforma erros assustadores em mensagens acolhedoras.
+            Voz calma e letra grande para usar portais como o <strong>Gov.br</strong> sozinho, com segurança e sem medo.
           </p>
           <div className="acoes anim-hero anim-hero-4">
             <Link
@@ -93,15 +91,12 @@ export function Home() {
                 falar('Vamos começar a demonstração do login com ajuda passo a passo.', config.leituraEmVoz)
               }
             >
-              Ver demonstração do Gov.br <span className="seta" aria-hidden="true"><SetaCtaIcon /></span>
-            </Link>
-            <Link to="/como-funciona" className="botao botao-secundario botao-grande">
-              Como funciona
+              Ver demonstração <span className="seta" aria-hidden="true"><SetaCtaIcon /></span>
             </Link>
           </div>
           <ul className="selos anim-hero anim-hero-5" aria-label="Benefícios">
-            <li><CheckIcon /> Sem instalar nada agora: roda no navegador</li>
-            <li><LockIcon /> Senhas nunca saem do aparelho</li>
+            <li><CheckIcon /> Funciona no navegador, sem instalar nada</li>
+            <li><LockIcon /> Suas senhas ficam só no seu aparelho</li>
             <li><PessoasIcon /> Tutoria reversa: jovens ensinam, todos aprendem</li>
           </ul>
         </div>
@@ -121,6 +116,7 @@ export function Home() {
               className={i === 0 ? 'cartao cartao-destaque anim-entrada' : 'cartao anim-entrada'}
               style={{ animationDelay: `${Math.min(i, 7) * 80}ms` }}
             >
+              {i === 0 && <span className="cartao-badge">Mais pedido</span>}
               <p className="cartao-cat">{s.categoria}</p>
               <h3>{s.nome}</h3>
               <p className="cartao-meta">
@@ -136,10 +132,9 @@ export function Home() {
 
       <section className="secao faixa" aria-labelledby="tit-tutoria">
         <div>
-          <h2 id="tit-tutoria">Tutoria reversa: quem ensina também aprende</h2>
+          <h2 id="tit-tutoria">Tutoria reversa</h2>
           <p>
-            Jovens voluntários (como os alunos do IFPA) acompanham os primeiros usos, à distância e sem
-            ver suas senhas. Depois de 3 tarefas concluídas sozinho, você ganha o selo{' '}
+            Jovens voluntários ensinam os primeiros passos, sem ver suas senhas. Depois de 3 tarefas feitas sozinho, você ganha o selo{' '}
             <strong>"Independente Digital"</strong>.
           </p>
           <Link to="/tutoria" className="botao botao-primario faixa-cta">

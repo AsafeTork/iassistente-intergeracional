@@ -58,7 +58,9 @@ export function Layout() {
               end={r.para === '/'}
               className={({ isActive }) => (isActive ? 'menu-link ativo' : 'menu-link')}
             >
-              {r.rotulo}
+              {({ isActive }) => (
+                <span aria-current={isActive ? 'page' : undefined}>{r.rotulo}</span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -84,6 +86,11 @@ export function Layout() {
             </p>
           </div>
         </div>
+        <nav aria-label="Voltar ao topo" className="rodape-topo">
+          <a href="#conteudo" className="rodape-topo-link">
+            ↑ Voltar ao início
+          </a>
+        </nav>
       </footer>
     </div>
   );
