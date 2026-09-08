@@ -43,34 +43,47 @@
 }
 /* === DESIGN TOKENS === */
 :root {
-  /* === SISTEMA DE PAPÉIS (HexPalette, tudo AA) — 1 foco + 1 caminho === */
-  /* Papel: papel/tinta — focal: título; support: texto; utility: fundo */
-  --paper: #FFFFFF;
-  --ink: #1B1B1B;
-  --muted: #595959;
-  --surface: #F8F8F8;
-  --border: #DCE6F5;
+  /* === IDENTIDADE Balcão Acolhedor 60-30-10 (GOV.UK tiers + Nubank calor + M3 On-colors) === */
+  /* 60% dominante — Papel Quente (calor vs branco estéril) */
+  --paper: #FBF6EC;
+  --paper-branco: #FFFFFF;
+  --tinta: #1B1B1B;
+  --suave: #4A4438;
+  --borda: #E7DCC3;
+  /* Compat: nomes EN anteriores viram aliases quentes */
+  --ink: var(--tinta);
+  --muted: var(--suave);
+  --surface: var(--paper);
+  --border: var(--borda);
 
-  /* Papel: ação primária — 1 azul real (CTA). Hover/active são estados, não competidores */
-  --primary: #1351B4;
+  /* 30% secundária — Mar Profundo (1 bloco navy: header/faixa/footer) */
+  --mar: #071D41;
+  --mar-tinta: #0B3B91;
+  /* Azul Gov rebaixado a SUPORTE — links/ícones/info, NUNCA fundo cheio */
+  --apoio: #1351B4;
+  --primary: var(--apoio);
   --primary-hover: #0F448F;
-  --primary-active: #0B3B91;
-  --link: #0B3B91;
+  --primary-active: var(--mar-tinta);
+  --link: var(--mar-tinta);
 
-  /* Papel: acento — máx 2 usos por tela (foco + detalhe ativo). Nunca texto corrido */
-  --accent: #FFCD07;
-  --focus-ring: #FFCD07;
+  /* 10% acento — Amarelo Cupuaçu (SÓ: CTA-destaque + foco + marcador ativo = máx 3 usos) */
+  --cupuacu: #FFCD07;
+  --foco: #FFCD07;
+  --accent: var(--cupuacu);
+  --focus-ring: var(--foco);
   --focus-width: 4px;
-  --focus-outline: 4px solid var(--focus-ring);
+  --focus-outline: 4px solid var(--foco);
   --focus-offset: 2px;
 
-  /* Papel: semânticas — success/warning/error AA sobre --paper */
-  --success: #168821;
+  /* Semânticas — AA sobre --paper */
+  --sucesso: #168821;
+  --success: var(--sucesso);
   --warning: #935000;
-  --error: #B3261E;
+  --erro: #B3261E;
+  --error: var(--erro);
 
-  /* Papel: institucional escuro — utility (topo balcão / rodapé), não compete com CTA */
-  --azul-escuro: #071D41;
+  /* Institucional escuro — alias inerte para --mar */
+  --azul-escuro: var(--mar);
 
   /* Alto Contraste */
   --hc-fundo: #000000;
@@ -134,26 +147,25 @@
   --shadow-md: 0 6px 20px rgba(7, 29, 65, 0.10), 0 2px 6px rgba(7, 29, 65, 0.08);
   --shadow-lg: 0 16px 40px rgba(7, 29, 65, 0.14), 0 4px 12px rgba(7, 29, 65, 0.10);
 
-  /* Aliases legados inertes — 1 azul real + alias; sem gradients/glass/neon */
-  --azul: var(--primary);
-  --azul-medio: var(--primary);
+  /* Aliases legados inertes — apontam p/ identidade; sem gradients/glass/neon */
+  --azul: var(--apoio);
+  --azul-medio: var(--apoio);
   --azul-claro: var(--primary-hover);
-  --amarelo: var(--accent);
-  --amarelo-escuro: var(--accent);
-  --amarelo-claro: var(--accent);
-  --amarelo-borda: var(--accent);
-  --verde: var(--success);
-  --vermelho: var(--error);
+  --amarelo: var(--cupuacu);
+  --amarelo-escuro: var(--cupuacu);
+  --amarelo-claro: var(--cupuacu);
+  --amarelo-borda: var(--cupuacu);
+  --verde: var(--sucesso);
+  --vermelho: var(--erro);
   --laranja: var(--warning);
-  --texto: var(--ink);
-  --texto-secundario: var(--muted);
-  --texto-suave: var(--muted);
-  --texto-no-azul: var(--ink);
-  --texto-suave-no-azul: var(--muted);
+  --texto: var(--tinta);
+  --texto-secundario: var(--suave);
+  --texto-suave: var(--suave);
+  --texto-no-azul: var(--tinta);
+  --texto-suave-no-azul: var(--suave);
   --fundo: var(--paper);
-  --fundo-alt: var(--surface);
-  --borda: var(--border);
-  --cartao: var(--paper);
+  --fundo-alt: var(--paper);
+  --cartao: var(--paper-branco);
   --sombra-azul: rgba(7, 29, 65, 0.15);
   --raio: var(--radius-md);
   --largura: 1080px;
@@ -213,11 +225,10 @@ html {
 body {
   margin: 0;
   font-family: var(--fonte);
-  background: var(--fundo-degradado);
-  background-attachment: fixed;
-  color: var(--texto-no-azul);
-  --texto: var(--texto-no-azul);
-  --texto-suave: var(--texto-suave-no-azul);
+  background: var(--paper);
+  color: var(--tinta);
+  --texto: var(--tinta);
+  --texto-suave: var(--suave);
   line-height: 1.6;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -228,8 +239,8 @@ body {
 .demo-info-card,
 .filtro-demo > div,
 .painel-tela {
-  --texto: #1c2733;
-  --texto-suave: #33404d;
+  --texto: var(--tinta);
+  --texto-suave: var(--suave);
   color: var(--texto);
 }
 
@@ -386,7 +397,7 @@ body.alto-contraste .liquid-glass::after {
 
 /* Topo balcão institucional — branco 85% + blur(16px) saturate(160%), borda #DCE6F5 */
 .topo {
-  border-bottom: 1px solid #DCE6F5;
+  border-bottom: 1px solid var(--borda);
   box-shadow: 0 1px 8px rgba(7, 29, 65, 0.08);
 }
 
@@ -463,7 +474,7 @@ main :focus, .conteudo :focus {
   background: rgba(255, 255, 255, 0.85);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   backdrop-filter: blur(16px) saturate(160%);
-  border-bottom: 1px solid #DCE6F5;
+  border-bottom: 1px solid var(--borda);
   color: var(--texto);
   position: sticky;
   top: 0;
@@ -573,8 +584,8 @@ body.alto-contraste .marca-icone {
 }
 .menu-link {
   color: var(--texto-suave);
-  background: #F2F6FD;
-  border: 1px solid #DCE6F5;
+  background: var(--paper-branco);
+  border: 1px solid var(--borda);
   text-decoration: none;
   padding: 0.55rem 1rem;
   border-radius: 999px;
@@ -665,31 +676,15 @@ body.alto-contraste .etiqueta {
   grid-template-columns: 1.15fr 0.85fr;
   gap: 2rem;
   align-items: center;
-  color: #1B1B1B;
-  /* Superfície branca editorial + faixa superior azul Gov.br (confiança) */
-  background: #FFFFFF;
-  border: 1px solid #DCE6F5;
-  border-top: 8px solid var(--azul);
+  color: var(--ink);
+  /* Superfície papel-branco + marcador de passo (assinatura) */
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-left: 6px solid var(--azul);
   border-radius: 20px;
   padding: clamp(1.5rem, 3vw, 2.5rem);
   box-shadow: var(--shadow-md);
   position: relative;
-  overflow: hidden;
-}
-/* Textura sutil: radial amarelo 8% num canto apenas — sem gradiente roxo/azul */
-.destaque::after {
-  content: "";
-  position: absolute;
-  width: 320px;
-  height: 320px;
-  right: -110px;
-  top: -110px;
-  background: radial-gradient(circle, rgba(255, 205, 7, 0.08), transparent 70%);
-  pointer-events: none;
-}
-.destaque > * {
-  position: relative;
-  z-index: 1;
 }
 /* Hierarquia editorial clara */
 .destaque-texto .etiqueta {
@@ -718,14 +713,12 @@ body.alto-contraste .etiqueta {
   grid-column: 1;
 }
 .destaque-mock {
-  background: #F2F6FD;
-  border: 1px solid #DCE6F5;
-  border-radius: 16px;
+  background: var(--paper);
+  border: 1px solid var(--borda);
+  border-radius: 20px;
   padding: 1rem;
   box-shadow: var(--shadow-sm);
   grid-column: 2;
-  margin-left: -24px;
-  transform: rotate(0deg);
 }
 /* Texto do hero — sempre escuro legível sobre branco (contraste ≥7:1) */
 .destaque h1,
@@ -744,11 +737,10 @@ body.alto-contraste .etiqueta {
   stroke: var(--azul);
 }
 .realce {
-  background: linear-gradient(transparent 62%, var(--amarelo) 62%, var(--amarelo) 96%, transparent 96%);
-  padding: 0 0.15rem;
-  border-radius: 4px;
   color: inherit;
-  /* Sublinhado marcador-amarelo: afeto sem quebrar contraste */
+  /* Sublinhado marcador-amarelo sólido: afeto sem gradiente de marcador-texto */
+  text-decoration: underline 4px var(--amarelo);
+  text-underline-offset: 6px;
 }
 .destaque .realce {
   color: var(--azul-escuro);
@@ -765,7 +757,7 @@ body.alto-contraste .etiqueta {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 0.9rem 1.5rem;
   font-size: 1.05rem;
   font-weight: 800;
@@ -830,7 +822,8 @@ body.alto-contraste .etiqueta {
 .destaque .realce {
   color: var(--azul-escuro);
   font-weight: 800;
-  background: linear-gradient(transparent 62%, #FFCD07 62%, #FFCD07 96%, transparent 96%);
+  text-decoration: underline 4px var(--amarelo);
+  text-underline-offset: 6px;
 }
 .destaque .botao {
   min-height: 48px;
@@ -843,15 +836,15 @@ body.alto-contraste .etiqueta {
   transform: none;
 }
 .destaque .botao-primario {
-  background: #1351B4;
+  background: var(--apoio);
   color: #FFFFFF;
-  border-color: #1351B4;
+  border-color: var(--apoio);
   min-height: 56px;
   box-shadow: none;
 }
 .destaque .botao-primario:hover {
-  background: #0B3B91;
-  border-color: #0B3B91;
+  background: var(--mar-tinta);
+  border-color: var(--mar-tinta);
   color: #FFFFFF;
   box-shadow: none;
   transform: none;
@@ -863,8 +856,8 @@ body.alto-contraste .etiqueta {
 }
 .destaque .botao-secundario {
   background: #FFFFFF;
-  color: #1351B4;
-  border-color: #1351B4;
+  color: var(--apoio);
+  border-color: var(--apoio);
   min-height: 56px;
   box-shadow: none;
 }
@@ -950,7 +943,6 @@ body.alto-contraste .etiqueta {
 body.alto-contraste .destaque {
   background: #000000;
   border: 3px solid #FFFF00;
-  border-top: 8px solid #FFFF00;
   box-shadow: none;
   color: #FFFFFF;
 }
@@ -975,7 +967,6 @@ body.alto-contraste .destaque-mock {
   .destaque {
     background: var(--dark-surface);
     border-color: #333333;
-    border-top-color: var(--azul-claro);
     color: var(--dark-texto);
   }
   .destaque-texto h1 {
@@ -1090,25 +1081,23 @@ body.alto-contraste .destaque-mock {
   color: var(--texto-suave);
 }
 .faixa {
-  background: #071D41;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
-  background-size: 18px 18px;
+  background: var(--azul-escuro);
   color: #fff;
-  border-radius: var(--raio);
+  border-radius: 20px;
   padding: clamp(1.5rem, 3vw, 2.2rem);
   margin-top: 2.2rem;
-  border-top: 6px solid var(--amarelo);
+  border-left: 6px solid var(--amarelo);
   box-shadow: var(--shadow-md);
 }
 .faixa h2 { color: #fff; }
 .faixa p { color: #E8EFFC; max-width: 62ch; }
 .faixa .botao-primario {
   background: var(--amarelo);
-  color: #071D41;
+  color: var(--azul-escuro);
   border-color: var(--amarelo);
   font-weight: 800;
 }
-.faixa .botao-primario:hover { background: #fff; border-color: #fff; color: #071D41; }
+.faixa .botao-primario:hover { background: var(--amarelo); border-color: var(--amarelo); color: var(--azul-escuro); }
 .faixa .botao-secundario {
   border-color: #fff;
 }
@@ -1121,8 +1110,8 @@ body.alto-contraste .destaque-mock {
 .grade .cartao { grid-column: span 4; }
 .grade .cartao:first-child {
   grid-column: span 7;
-  background: #F2F6FD;
-  border: 1px solid #C2D4F5;
+  background: var(--cartao);
+  border: 1px solid var(--borda);
   border-left: 6px solid var(--azul);
 }
 .grade .cartao:nth-child(2) { grid-column: span 5; }
@@ -1131,15 +1120,15 @@ body.alto-contraste .destaque-mock {
 }
 .cartao {
   background: var(--cartao);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 1.2rem;
-  box-shadow: 0 1px 3px rgba(7, 29, 65, 0.08);
-  border: 1px solid #DCE6F5;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--borda);
   transition: transform 200ms ease-out, box-shadow 200ms ease-out;
 }
 .cartao:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px var(--sombra-azul);
+  box-shadow: var(--shadow-md);
 }
 .cartao.liquid-glass {
   background: rgba(255,255,255,0.05);
@@ -3850,8 +3839,8 @@ a:hover { color: var(--azul-escuro); }
 }
 .grade .cartao:first-child {
   grid-column: span 7;
-  background: #F2F6FD;
-  border-left: 6px solid #1351B4;
+  background: var(--paper-branco);
+  border-left: 6px solid var(--apoio);
 }
 @media (max-width: 900px) {
   .grade .cartao,
@@ -3868,9 +3857,9 @@ a:hover { color: var(--azul-escuro); }
 
 /* --- Cartão branco: borda 1px + sombra suave + hover lift 4px --- */
 .grade .cartao {
-  background: #fff;
-  border: 1px solid #DCE6F5 !important;
-  border-radius: 16px !important;
+  background: var(--paper-branco);
+  border: 1px solid var(--borda) !important;
+  border-radius: 20px !important;
   padding: 1.25rem 1.25rem 1.1rem;
   box-shadow: 0 1px 3px rgba(7, 29, 65, 0.08) !important;
   display: flex;
@@ -3879,15 +3868,15 @@ a:hover { color: var(--azul-escuro); }
   transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
 }
 .grade .cartao:first-child {
-  background: #F2F6FD;
-  border: 1px solid #DCE6F5 !important;
-  border-left: 6px solid #1351B4 !important;
+  background: var(--paper-branco);
+  border: 1px solid var(--borda) !important;
+  border-left: 6px solid var(--apoio) !important;
 }
 .grade .cartao:hover,
 .grade .cartao:focus-within {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(7, 29, 65, 0.12) !important;
-  border-color: #C2D4F5 !important;
+  border-color: var(--apoio) !important;
 }
 /* Estado por borda + elevação, nunca só cor: foco visível amarelo */
 .grade .cartao:focus-within {
@@ -3909,9 +3898,9 @@ a:hover { color: var(--azul-escuro); }
 /* Alias explícito do destaque (equivale a :first-child; robusto a reordenação) */
 .grade .cartao-destaque {
   grid-column: span 7;
-  background: #F2F6FD;
-  border: 1px solid #DCE6F5 !important;
-  border-left: 6px solid #1351B4 !important;
+  background: var(--cartao);
+  border: 1px solid var(--borda) !important;
+  border-left: 6px solid var(--azul) !important;
 }
 
 /* --- Categoria em pílula azul-clara (texto + forma, não só cor) --- */
@@ -3959,13 +3948,10 @@ a:hover { color: var(--azul-escuro); }
   outline-offset: 2px;
 }
 
-/* --- Faixa tutoria: azul-escuro sólido + pontilhado sutil (SEM gradiente) --- */
+/* --- Faixa tutoria: azul-escuro sólido (SEM pontilhado, SEM fita) --- */
 .secao.faixa {
-  background-color: #071D41;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1.2px, transparent 1.3px);
-  background-size: 22px 22px;
+  background-color: var(--azul-escuro);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   padding: 2rem 1.6rem;
   box-shadow: 0 8px 28px rgba(7, 29, 65, 0.28);
@@ -3981,18 +3967,16 @@ a:hover { color: var(--azul-escuro); }
 /* Botão amarelo de alto contraste: única ação principal da faixa */
 .secao.faixa .faixa-cta,
 .secao.faixa .botao-primario {
-  background: #FFCD07;
-  color: #071D41;
-  border: 2px solid #7A5C00;
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+  border: 2px solid transparent;
   border-radius: 12px;
-  min-height: 56px;
+  min-height: 48px;
   font-weight: 800;
-  box-shadow: 0 2px 0 #7A5C00;
 }
 .secao.faixa .faixa-cta:hover,
 .secao.faixa .botao-primario:hover {
   background: #ffd82e;
-  box-shadow: 0 2px 0 #7a5c00, 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 .secao.faixa .faixa-cta:focus-visible,
 .secao.faixa .botao-primario:focus-visible {
