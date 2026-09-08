@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { SERVICOS_DEMO } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
 import { AIAvatar } from '../components/AIAvatar';
+import { BarraAcessibilidade } from '../components/BarraAcessibilidade';
 import { PhoneEmulator3D } from '../components/PhoneEmulator3D';
 import { PhonePagination } from '../components/PhonePagination';
 import { PhoneScreen, type Tela } from '../components/PhoneScreen';
@@ -44,7 +45,7 @@ export function Demonstracao() {
     setAuto(true);
   }
 
-  function pararAuto(msg = 'Você assumiu o controle. Continue de onde parou, sem pressa.') {
+  function pararAuto(msg = 'Você assumiu o controle. Continuo aqui, do seu lado, sem pressa.') {
     setAuto(false);
     setMensagem(msg);
   }
@@ -59,6 +60,8 @@ export function Demonstracao() {
         <Link to="/">Início</Link> › Demonstração guiada
       </p>
       <h1>Demonstração interativa</h1>
+      {/* WCAG 2.2 3.2.6: mesma ordem da ajuda em todas as páginas — Barra primeiro, painel assistente depois (igual à Home) */}
+      <BarraAcessibilidade />
       <p className="subtitulo">
         Use o celular 3D como se fosse real — ou aperte <strong>Ver sozinho</strong> e
         assista a IA fazer tudo, como se estivesse gerando a solução naquele momento.
@@ -85,14 +88,14 @@ export function Demonstracao() {
 
       <div className="demo-3d-area">
         <section className="painel-assistente" aria-live="polite" aria-label="Assistente">
-          <p className="etiqueta"><RobotIcon /> Assistente diz:</p>
+          <p className="etiqueta"><AIAvatar size="sm" /> Assistente Lia diz:</p>
           <p className="fala-grande">"{mensagem}"</p>
           <div className="acoes-linha">
             <button type="button" className="botao botao-secundario" onClick={() => anunciar(mensagem)}>
               <VolumeIcon /> Ouvir de novo
             </button>
             {auto && (
-              <span className="etiqueta" role="status"><AIAvatar size="sm" /> gerando ao vivo…</span>
+              <span className="etiqueta"><AIAvatar size="sm" live /> gerando ao vivo…</span>
             )}
           </div>
         </section>
@@ -106,7 +109,7 @@ export function Demonstracao() {
               onMensagem={setMensagem}
               onTelaMuda={setTelaFone}
               salto={salto}
-              onAutoFim={() => pararAuto('Pronto! Fiz tudo sozinha — agora tente você, sem pressa.')}
+              onAutoFim={() => pararAuto('Pronto! Fiz tudo sozinha — agora tente você, eu vou acompanhar.')}
             />
           </PhoneEmulator3D>
           <PhonePagination
@@ -119,9 +122,9 @@ export function Demonstracao() {
         </section>
       </div>
 
-      <section className="demo-info-lateral">
+      <section className="demo-info-lateral" aria-label="Ajuda sobre a demonstração">
         <div className="demo-info-card">
-          <h3>Como usar</h3>
+          <h2>Como usar</h2>
           <ul>
             <li>Toque nos <strong>ícones</strong> do celular para navegar</li>
             <li>O <strong>assistente</strong> guia cada passo com voz</li>
@@ -130,7 +133,7 @@ export function Demonstracao() {
           </ul>
         </div>
         <div className="demo-info-card">
-          <h3>O que está sendo demonstrado</h3>
+          <h2>O que está sendo demonstrado</h2>
           <ul>
             <li>Tela inicial com apps (como um celular real)</li>
             <li>Abrindo o navegador → Gov.br</li>

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
+import { AIAvatar } from './AIAvatar';
 
 type Modo = '3d' | '2d' | 'auto';
 
@@ -116,7 +117,7 @@ export function PhoneEmulator3D({ children, mensagem, tiltMax = 8, modo = 'auto'
 
             {mensagem && (
               <div className="phone-chat-bubble">
-                <div className="phone-chat-dot" />
+                <AIAvatar chat live={false} />
                 <div className="phone-chat-texto">{mensagem.slice(0, 90)}{mensagem.length > 90 ? '…' : ''}</div>
               </div>
             )}

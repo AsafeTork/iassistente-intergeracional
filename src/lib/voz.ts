@@ -63,31 +63,54 @@ if (temWebSpeech()) {
   }
 }
 
+/** Ritmo idoso (pesquisa: 124-145 WPM, não 165): rate 1.0 ≈ 165 WPM → 0.8 ≈ 132 WPM. */
+export const VELOCIDADE_PADRAO_IDOSO = 0.8;
+/** Pausa entre frases para processamento (idosos). */
+export const PAUSA_ENTRE_FRASES_MS = 600;
+
+/** Quebra o texto em frases (mantém pontuação) para agendar pausas. */
+export function dividirEmFrases(texto: string): string[] {
+  const partes = texto.match(/[^.!?…]+[.!?…]+["”)]?|[^.!?…]+$/g);
+  if (!partes) return [texto].map((s) => s.trim()).filter(Boolean);
+  return partes.map((s) => s.trim()).filter(Boolean);
+}
+
+/** Token que invalida setTimeouts pendentes após falar()/silenciar() (sem preempção). */
+let sequenciaFala = 0;
+
 export const provedorWebSpeech: ProvedorVoz = {
   id: 'web-speech',
   disponivel: () => temWebSpeech(),
-  falar: ({ texto, habilitado, velocidade = 0.95 }) => {
+  falar: ({ texto, habilitado, velocidade = VELOCIDADE_PADRAO_IDOSO }) => {
     if (!habilitado || !temWebSpeech()) return;
     try {
       const synth = window.speechSynthesis;
       synth.cancel();
-      const msg = new SpeechSynthesisUtterance(texto);
-      msg.lang = 'pt-BR';
-      msg.rate = velocidade;
-      msg.pitch = 1.0;
-      msg.volume = 1.0;
+      const minhaVez = ++sequenciaFala;
+      const frases = dividirEmFrases(texto);
       const voz = escolherVozPtBR();
-      if (voz) {
-        msg.voice = voz;
-        msg.lang = voz.lang;
-      }
-      synth.speak(msg);
+      frases.forEach((frase, i) => {
+        window.setTimeout(() => {
+          if (minhaVez !== sequenciaFala || !temWebSpeech()) return;
+          const msg = new SpeechSynthesisUtterance(frase);
+          msg.lang = 'pt-BR';
+          msg.rate = velocidade;
+          msg.pitch = 1.0;
+          msg.volume = 1.0;
+          if (voz) {
+            msg.voice = voz;
+            msg.lang = voz.lang;
+          }
+          window.speechSynthesis.speak(msg);
+        }, i * PAUSA_ENTRE_FRASES_MS);
+      });
     } catch {
       /* voz indisponível: segue só com o texto visual */
     }
   },
   silenciar: () => {
     try {
+      sequenciaFala++;
       if (temWebSpeech()) window.speechSynthesis.cancel();
     } catch {
       /* nada a cancelar */

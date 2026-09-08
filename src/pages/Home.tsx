@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { BarraAcessibilidade } from '../components/BarraAcessibilidade';
 import { MockupFalante } from '../components/MockupFalante';
 import { SERVICOS } from '../data/mock';
@@ -41,25 +42,50 @@ function SetaDirIcon() {
   );
 }
 
+function SetaCtaIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  );
+}
+
 export function Home() {
   const { config } = useAcessibilidade();
+
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || els.length === 0) {
+      els.forEach((el) => el.classList.add('visivel'));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('visivel'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   return (
     <div>
       <BarraAcessibilidade />
 
-      <section className="destaque">
+      <section className="destaque" aria-labelledby="tit-hero">
         <div className="destaque-texto">
-          <p className="etiqueta">Acessível • Gratuito • Sem instalar</p>
-          <h1>
+          <p className="etiqueta anim-hero anim-hero-1">Gov.br • Acessível • Gratuito • Sem instalar</p>
+          <h1 id="tit-hero" className="anim-hero anim-hero-2">
             O celular explica <span className="realce">passo a passo</span>, com voz calma e letra grande.
           </h1>
-          <p className="subtitulo">
+          <p className="subtitulo anim-hero anim-hero-3">
             O <strong>IAssistente Intergeracional</strong> ajuda idosos e pessoas com dificuldade visual a
             usar portais como o <strong>Gov.br</strong> sozinhos: destaca onde tocar, traduz palavras
             difíceis e transforma erros assustadores em mensagens acolhedoras.
           </p>
-          <div className="acoes">
+          <div className="acoes anim-hero anim-hero-4">
             <Link
               to="/demonstracao"
               className="botao botao-primario botao-grande"
@@ -67,33 +93,37 @@ export function Home() {
                 falar('Vamos começar a demonstração do login com ajuda passo a passo.', config.leituraEmVoz)
               }
             >
-              ▶ Ver demonstração do Gov.br
+              Ver demonstração do Gov.br <span className="seta" aria-hidden="true"><SetaCtaIcon /></span>
             </Link>
             <Link to="/como-funciona" className="botao botao-secundario botao-grande">
               Como funciona
             </Link>
           </div>
-          <ul className="selos" aria-label="Benefícios">
+          <ul className="selos anim-hero anim-hero-5" aria-label="Benefícios">
             <li><CheckIcon /> Sem instalar nada agora: roda no navegador</li>
             <li><LockIcon /> Senhas nunca saem do aparelho</li>
             <li><PessoasIcon /> Tutoria reversa: jovens ensinam, todos aprendem</li>
           </ul>
         </div>
 
-        <div className="destaque-mock" aria-label="Exemplo da interface assistiva">
+        <div className="destaque-mock" role="img" aria-label="Exemplo da interface assistiva">
           <MockupFalante />
         </div>
       </section>
 
-      <section className="secao" aria-labelledby="tit-servicos">
+      <section className="secao reveal" aria-labelledby="tit-servicos">
         <h2 id="tit-servicos">O que o assistente ajuda a fazer</h2>
         <p className="secao-sub">Exemplos de serviços guiados passo a passo (dados fictícios).</p>
         <div className="grade">
-          {SERVICOS.map((s) => (
-            <article key={s.id} className="cartao">
+          {SERVICOS.map((s, i) => (
+            <article
+              key={s.id}
+              className={i === 0 ? 'cartao cartao-destaque anim-entrada' : 'cartao anim-entrada'}
+              style={{ animationDelay: `${Math.min(i, 7) * 80}ms` }}
+            >
               <p className="cartao-cat">{s.categoria}</p>
               <h3>{s.nome}</h3>
-              <p>
+              <p className="cartao-meta">
                 {s.passos} passos • <strong>{s.dificuldade}</strong>
               </p>
               <Link to="/demonstracao" className="cartao-link">
@@ -112,7 +142,7 @@ export function Home() {
             ver suas senhas. Depois de 3 tarefas concluídas sozinho, você ganha o selo{' '}
             <strong>"Independente Digital"</strong>.
           </p>
-          <Link to="/tutoria" className="botao botao-primario">
+          <Link to="/tutoria" className="botao botao-primario faixa-cta">
             Conhecer tutores
           </Link>
         </div>

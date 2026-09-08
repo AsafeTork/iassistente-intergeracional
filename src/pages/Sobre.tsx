@@ -55,6 +55,17 @@ export function Sobre() {
         </p>
       </section>
 
+      <section className="secao" aria-labelledby="tit-emag">
+        <h2 id="tit-emag">Conformidade declarada — eMAG 3.1 (Portaria nº 3/2007)</h2>
+        <p>
+          Este protótipo segue o Modelo de Acessibilidade em Governo Eletrônico (eMAG 3.1):
+          marcação semântica, navegação por teclado com link “pular para o conteúdo”,
+          contraste mínimo, foco sempre visível e formulários com rótulos e instruções claras.
+          Conformidade declarada ao art. 63 do LBI (Lei Brasileira de Inclusão). Divergências conhecidas desta versão de demonstração estão listadas na página{' '}
+          <Link to="/acessibilidade">Acessibilidade</Link>.
+        </p>
+      </section>
+
       <section className="secao" aria-labelledby="tit-ref">
         <h2 id="tit-ref">Referências do artigo</h2>
         <ul className="lista">

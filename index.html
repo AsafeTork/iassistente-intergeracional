@@ -14,5 +14,18 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // VLibras plugin - inclusão de libras com segurança
+      try {
+        const script = document.createElement('script');
+        script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+        script.async = true;
+        script.onload = () => { if (window.vLibras) window.vLibras.init(); };
+        script.onerror = () => { /* plugin indisponível: segue sem quebras */ };
+        document.body.appendChild(script);
+      } catch {
+        /* script tag failed: segue sem VLibras */
+      }
+    </script>
   </body>
 </html>

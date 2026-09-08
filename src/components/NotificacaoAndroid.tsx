@@ -22,7 +22,7 @@ export function NotificacaoAndroid({ remetente, codigo, aberta, onAbrir, onUsarC
       >
         <span className="ph-notif-pip-app">SMS</span>
         <span className="ph-notif-pip-texto">
-          {remetente}: seu código é {codigo}
+          {remetente}: seu código é {codigo}. Golpistas pedem código por WhatsApp. Nunca compartilhe. Use só aqui.
         </span>
       </button>
     );
@@ -43,7 +43,7 @@ export function NotificacaoAndroid({ remetente, codigo, aberta, onAbrir, onUsarC
           </span>
         </div>
         <p className="ph-notif-card-texto">
-          Seu código de acesso é <strong>{codigo}</strong>. Não compartilhe com ninguém.
+          Seu código de acesso é <strong>{codigo}</strong>. Golpistas pedem código por WhatsApp. Nunca compartilhe. Use só aqui.
         </p>
         <button type="button" className="ph-notif-usar" onClick={onUsarCodigo}>
           Usar este código

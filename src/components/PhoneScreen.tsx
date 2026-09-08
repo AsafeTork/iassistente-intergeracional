@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { SERVICOS_DEMO, type ServicoDemo } from '../data/mock';
+import { CAMINHOS_NIVEL, NIVEIS_CONTA, SERVICOS_DEMO, type NivelConta, type ServicoDemo } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
+import { traduzirErro } from '../lib/tradutorErros';
 import { AIScanHighlight } from './AIScanHighlight';
-import { GovFrame } from './GovFrame';
+import { GovbrNativo } from './GovbrNativo';
+import { LoadingAcessivel } from './LoadingAcessivel';
 import { NotificacaoAndroid } from './NotificacaoAndroid';
+import { Skeleton } from './Skeleton';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
 
@@ -21,6 +24,8 @@ type Props = {
   onTelaMuda?: (tela: Tela) => void;
   /** Salto de tela vindo da paginação externa. */
   salto?: { tela: Tela; n: number };
+  /** Nível conquistado exibido no selo da tela de conclusão. Padrão: bronze. */
+  nivelInicial?: NivelConta;
 };
 
 function Bullet() {
@@ -34,8 +39,8 @@ function Bullet() {
 function GovLogo({ small = false }: { small?: boolean }) {
   return (
     <svg viewBox="0 0 120 40" width={small ? 64 : 88} height={small ? 22 : 30} role="img" aria-label="gov.br">
-      <text x="0" y="28" fontFamily="'Rawline', system-ui" fontWeight="800" fontSize="28" fill="#1351B4">gov</text>
-      <text x="52" y="28" fontFamily="'Rawline', system-ui" fontWeight="400" fontSize="28" fill="#1351B4">.br</text>
+      <text x="0" y="28" fontFamily="'Rawline', system-ui" fontWeight="800" fontSize="28" fill="var(--azul)">gov</text>
+      <text x="52" y="28" fontFamily="'Rawline', system-ui" fontWeight="400" fontSize="28" fill="var(--azul)">.br</text>
     </svg>
   );
 }
@@ -206,6 +211,16 @@ function Alerta() {
   );
 }
 
+function SobeNivel() {
+  return (
+    <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3v12"/>
+      <polyline points="5 10 12 3 19 10"/>
+      <path d="M5 21h14"/>
+    </svg>
+  );
+}
+
 function Volume() {
   return (
     <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="var(--azul)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -236,7 +251,7 @@ function Pessoas() {
 }
 
 const APPS: { id: string; nome: string; cor: string; icone: ReactNode }[] = [
-  { id: 'govbr', nome: 'Gov.br', cor: '#1351b4', icone: <GovLogoWhite small /> },
+  { id: 'govbr', nome: 'Gov.br', cor: 'var(--azul)', icone: <GovLogoWhite small /> },
   { id: 'chrome', nome: 'Chrome', cor: '#4285f4', icone: <Globe /> },
   { id: 'whatsapp', nome: 'WhatsApp', cor: '#25d366', icone: <Chat /> },
   { id: 'camera', nome: 'Câmera', cor: '#333', icone: <Camera /> },
@@ -246,17 +261,20 @@ const APPS: { id: string; nome: string; cor: string; icone: ReactNode }[] = [
   { id: 'notas', nome: 'Notas', cor: '#fbbc04', icone: <Notas /> },
 ];
 
-export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onAutoFim, onTelaMuda, salto }: Props) {
+export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onAutoFim, onTelaMuda, salto, nivelInicial = 'bronze' }: Props) {
   const { config } = useAcessibilidade();
   const servico: ServicoDemo = SERVICOS_DEMO.find((s) => s.id === servicoId) ?? SERVICOS_DEMO[0];
   const passos = servico.passos;
+  const [nivel, setNivel] = useState<NivelConta>(nivelInicial);
   const [tela, setTelaEstado] = useState<Tela>('home');
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
   const [scanIndex, setScanIndex] = useState(-1);
   const [notif, setNotif] = useState<'oculta' | 'pip' | 'aberta'>('oculta');
+  const [nivelAberto, setNivelAberto] = useState(false);
   const navTimer = useRef<number | null>(null);
+  const erroResumoRef = useRef<HTMLDivElement>(null);
   const autoTimers = useRef<number[]>([]);
   const autoRef = useRef(auto);
   autoRef.current = auto;
@@ -286,6 +304,18 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   }, [saltoN]);
 
   const passo = passos[indice];
+
+  // Padrão GOV.UK: a MESMA redação traduzida aparece no resumo e junto ao campo.
+  const textoTraduzidoErro = passo.erroTecnico ? traduzirErro(passo.erroTecnico, passo.id) : '';
+
+  function focarCampo(passoId: string) {
+    document.getElementById(`campo-${passoId}`)?.focus();
+  }
+
+  // GOV.UK: ao mostrar erro, mover o foco para o resumo (tabIndex -1 + .focus()).
+  useEffect(() => {
+    if (mostrarErro) erroResumoRef.current?.focus();
+  }, [mostrarErro, indice]);
 
   function anunciar(texto: string) {
     falar(texto, config.leituraEmVoz);
@@ -530,8 +560,10 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
           </AIScanHighlight>
         </div>
         <div className="ph-browser-loading">
+          <LoadingAcessivel mensagem="Conectando ao Gov.br..." />
           <div className="ph-browser-spinner" />
           <span>Carregando gov.br...</span>
+          <Skeleton linhas={4} />
           <button className="ph-browser-cancel" onClick={() => setTela('home')}>Cancelar</button>
         </div>
       </div>
@@ -541,7 +573,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   if (tela === 'govbr') {
     return (
       <div className="ph-govbr" onPointerDownCapture={() => { if (autoRef.current) fimRef.current?.(); }}>
-        <GovFrame onAvancar={abrirGovbr} onMensagem={anunciar} />
+        <GovbrNativo onAvancar={abrirGovbr} onMensagem={anunciar} />
         <div className="ph-govbr-info">
           <p><Bullet /> Acesse mais de 4.000 serviços</p>
           <p><Bullet /> Segurança garantida</p>
@@ -551,12 +583,49 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   }
 
   if (tela === 'concluido') {
+    const nivelAtual = NIVEIS_CONTA[nivel];
     return (
       <div className="ph-sucesso">
         <div className="ph-sucesso-icone"><Estrela /></div>
         <h3>Conta aberta!</h3>
         <p>Você concluiu {servico.nome} com sucesso.</p>
-        <AIScanHighlight delay={0.5} cor="#1d7a3a">
+        {servico.id === 'govbr' && (
+          <div className="ph-nivel-card">
+            <span className="ph-nivel-selo" style={{ background: nivelAtual.cor }}>
+              Nível {nivelAtual.rotulo}
+            </span>
+            <p className="ph-nivel-desc">{nivelAtual.descricao}</p>
+            <button
+              type="button"
+              className="ph-btn ph-btn-secundario ph-nivel-toggle"
+              aria-expanded={nivelAberto}
+              onClick={() => {
+                const caminhos = CAMINHOS_NIVEL.map(
+                  (c) => `${NIVEIS_CONTA[c.para].rotulo}: ${c.fala}`,
+                ).join('. ');
+                anunciar(`Para aumentar o nível da sua conta, você pode: ${caminhos}. Vou recomeçar a demonstração.`);
+                setNivelAberto(false);
+                setMostrarErro(false);
+                setNotif('oculta');
+                setIndice(0);
+                setValor('');
+                setTela('home');
+              }}
+            >
+              <SobeNivel /> Aumentar nível
+            </button>
+            {nivelAberto && (
+              <ul className="ph-nivel-caminhos">
+                {CAMINHOS_NIVEL.map((c, i) => (
+                  <li key={`${c.para}-${i}`}>
+                    <strong>{NIVEIS_CONTA[c.para].rotulo}:</strong> {c.fala}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+        <AIScanHighlight delay={0.5} cor="var(--verde)">
           <button className="ph-btn ph-btn-primario" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
             Voltar ao início
           </button>
@@ -586,7 +655,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
           onFechar={() => setNotif('pip')}
         />
       )}
-      <div style={{ background: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
+      <div style={{ background: 'var(--azul)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button onClick={() => setTela('govbr')} aria-label="Voltar" style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', cursor: 'pointer', padding: 4, color: '#fff' }}>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -600,9 +669,9 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
           <Hamburger />
         </button>
       </div>
-      <div style={{ height: 2, background: '#FFCD07', flexShrink: 0 }} />
+      <div style={{ height: 2, background: 'var(--amarelo)', flexShrink: 0 }} />
       <div style={{ padding: '10px 16px 0', textAlign: 'left' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#1351B4' }}>Entrar com gov.br</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--azul)' }}>Entrar com gov.br</span>
       </div>
 
       <div className="ph-login-progresso">
@@ -623,20 +692,29 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
 
       {passo.campo ? (
         <AIScanHighlight delay={0.2} block label={passo.campo.rotulo}>
-          <div className="ph-login-campo--foco" style={{ margin: '10px 16px', background: '#fff', border: 'none', padding: 0 }}>
-            <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#1351B4', marginBottom: 6 }}>
+          <div className="ph-login-campo--foco" style={{ margin: '10px 16px', background: 'var(--fundo)', border: 'none', padding: 0 }}>
+            <label htmlFor={`campo-${passo.id}`} style={{ display: 'block', fontSize: '0.7rem', fontWeight: 600, color: 'var(--azul)', marginBottom: 6 }}>
               {passo.campo.tipo === 'cpf' ? 'Digite seu CPF aqui' : passo.campo.rotulo}
             </label>
             <input
+              id={`campo-${passo.id}`}
+              name={passo.campo.tipo === 'cpf' ? 'cpf' : passo.campo.tipo === 'senha' ? 'password' : passo.campo.tipo === 'codigo' ? 'codigo' : passo.id}
               value={valor}
               onChange={(e) => setValor(e.target.value)}
               placeholder={passo.campo.exemplo}
-              inputMode={passo.campo.tipo === 'texto' ? 'text' : 'numeric'}
+              inputMode={passo.campo.tipo === 'senha' ? 'text' : 'numeric'}
               type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
-              autoComplete="off"
-              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: '3px solid var(--amarelo)', fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: '#333', background: '#fff' }}
+              autoComplete={passo.campo.tipo === 'cpf' ? 'username' : passo.campo.tipo === 'senha' ? 'current-password' : passo.campo.tipo === 'codigo' ? 'one-time-code' : 'off'}
+              aria-invalid={mostrarErro || undefined}
+              aria-describedby={mostrarErro && textoTraduzidoErro ? `erro-${passo.id}` : undefined}
+              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: `3px solid ${mostrarErro ? 'var(--vermelho)' : 'var(--amarelo)'}`, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: 'var(--texto)', background: 'var(--fundo)' }}
             />
-            <small style={{ display: 'block', marginTop: 6, color: '#595959', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
+            {mostrarErro && textoTraduzidoErro && (
+              <p id={`erro-${passo.id}`} className="ph-login-campo-erro">
+                {textoTraduzidoErro}
+              </p>
+            )}
+            <small style={{ display: 'block', marginTop: 6, color: 'var(--texto-secundario)', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
             <button className="ph-btn ph-btn-primario" onClick={avancar} style={{ marginTop: 10, width: '100%' }}>
               Enviar
             </button>
@@ -651,10 +729,19 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
       )}
 
       {mostrarErro && passo.erroTecnico && (
-        <div className="ph-login-erro">
+        <div ref={erroResumoRef} tabIndex={-1} role="alert" aria-labelledby={`resumo-erro-tit-${passo.id}`} className="ph-login-erro">
+          <h3 id={`resumo-erro-tit-${passo.id}`} className="ph-login-erro-titulo">
+            Há um problema
+          </h3>
           <div className="ph-login-erro-portal">
             <span className="ph-login-erro-icon"><X /></span>
-            <span>{passo.erroTecnico}</span>
+            <button
+              type="button"
+              className="ph-login-erro-link"
+              onClick={() => focarCampo(passo.id)}
+            >
+              {passo.campo?.rotulo ?? passo.id}: {textoTraduzidoErro}
+            </button>
           </div>
           <div className="ph-login-erro-assistente">
             <span className="ph-login-erro-icon"><Robot /></span>

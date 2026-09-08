@@ -1,10 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { provedorAtivo } from '../lib/voz';
+import { useReducedMotion } from './useReducedMotion';
 
 export type AcessibilidadeConfig = {
   fonteGrande: boolean;
   altoContraste: boolean;
   modoSimples: boolean;
   leituraEmVoz: boolean;
+  libras: boolean;
+  reduceMotion: boolean;
+  darkMode: boolean;
 };
 
 const CHAVE = 'iassistente:config:v1';
@@ -14,13 +19,29 @@ const PADRAO: AcessibilidadeConfig = {
   altoContraste: false,
   modoSimples: false,
   leituraEmVoz: true,
+  libras: false,
+  reduceMotion: false,
+  darkMode: false,
 };
 
 function carregar(): AcessibilidadeConfig {
   try {
     const bruto = localStorage.getItem(CHAVE);
-    if (!bruto) return PADRAO;
-    return { ...PADRAO, ...JSON.parse(bruto) };
+    if (!bruto) {
+      // Sem config salva: respeita preferência do SO (prefers-color-scheme: dark).
+      if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+        return { ...PADRAO, darkMode: true };
+      }
+      return PADRAO;
+    }
+    const parsed = JSON.parse(bruto);
+    // Config legada sem darkMode: aplica preferência do SO antes do default.
+    if (parsed && typeof parsed.darkMode === 'undefined') {
+      if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+        return { ...PADRAO, ...parsed, darkMode: true };
+      }
+    }
+    return { ...PADRAO, ...parsed };
   } catch {
     return PADRAO;
   }
@@ -35,6 +56,7 @@ const Ctx = createContext<Contexto>({ config: PADRAO, alternar: () => {} });
 
 export function ProvedorAcessibilidade({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<AcessibilidadeConfig>(carregar);
+  const prefereReduzido = useReducedMotion();
 
   useEffect(() => {
     try {
@@ -45,7 +67,9 @@ export function ProvedorAcessibilidade({ children }: { children: ReactNode }) {
     document.body.classList.toggle('fonte-grande', config.fonteGrande);
     document.body.classList.toggle('alto-contraste', config.altoContraste);
     document.body.classList.toggle('modo-simples', config.modoSimples);
-  }, [config]);
+    document.body.classList.toggle('reduce-motion', config.reduceMotion || prefereReduzido);
+    document.body.classList.toggle('dark', config.darkMode);
+  }, [config, prefereReduzido]);
 
   // Cancela a fala ao desligar a leitura em voz alta.
   useEffect(() => {
@@ -71,8 +95,6 @@ export function ProvedorAcessibilidade({ children }: { children: ReactNode }) {
 export function useAcessibilidade() {
   return useContext(Ctx);
 }
-
-import { provedorAtivo } from '../lib/voz';
 
 /** Fala um texto em pt-BR via provedor de voz ativo (padrão: Web Speech on-device). */
 export function falar(texto: string, habilitado: boolean) {

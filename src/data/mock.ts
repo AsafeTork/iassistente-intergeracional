@@ -17,7 +17,7 @@ export const PASSOS_GOVBR: Passo[] = [
     campo: { rotulo: 'CPF', exemplo: '123.456.789-00', tipo: 'cpf' },
     erroTecnico: 'Erro 400: documento inválido.',
     erroAmigavel:
-      'Ops! Parece que faltou algum número do CPF. Vamos conferir juntos, sem pressa: conte 11 números.',
+      'Parece que faltou algum número do CPF. Vamos conferir juntos, sem pressa — conte 11 números comigo.',
   },
   {
     id: 'senha',
@@ -28,7 +28,7 @@ export const PASSOS_GOVBR: Passo[] = [
     campo: { rotulo: 'Senha', exemplo: '••••••••', tipo: 'senha' },
     erroTecnico: 'Credenciais inválidas. Tentativas restantes: 2.',
     erroAmigavel:
-      'Essa senha não combinou. Que tal tentar de novo com calma? Se precisar, peça ajuda ao seu tutor jovem.',
+      'Essa senha não combinou, mas tudo bem. Que tal tentar de novo com calma? Se precisar, peça ajuda ao seu tutor.',
   },
   {
     id: 'codigo',
@@ -38,7 +38,7 @@ export const PASSOS_GOVBR: Passo[] = [
     campo: { rotulo: 'Código de 6 números', exemplo: '4 8 2 9 1 6', tipo: 'codigo' },
     erroTecnico: 'Token expirado. Solicite novo código.',
     erroAmigavel:
-      'Esse código venceu porque demorou um pouquinho. Não tem problema! Toque em "mandar outro código".',
+      'Esse código venceu porque demorou um pouquinho. Não tem problema! Toque em "mandar outro código" e eu espero aqui.',
   },
   {
     id: 'pronto',
@@ -97,7 +97,7 @@ export const PASSOS_SUS: Passo[] = [
     detalhe: 'Só números. O cartão fica atrás da carteirinha amarela do SUS.',
     campo: { rotulo: 'Cartão SUS', exemplo: '898 1234 5678 9012', tipo: 'texto' },
     erroTecnico: 'Cartão não encontrado na base.',
-    erroAmigavel: 'Não achei esse cartão. Vamos conferir número por número, sem pressa.',
+    erroAmigavel: 'Não achei esse cartão. Vamos conferir número por número, sem pressa — eu ajudo.',
   },
   {
     id: 'data',
@@ -117,6 +117,34 @@ export const PASSOS_SUS: Passo[] = [
 export const SERVICOS_DEMO: ServicoDemo[] = [
   { id: 'govbr', nome: 'Gov.br', portal: 'gov.br', codigoSMS: '482 916', passos: PASSOS_GOVBR },
   { id: 'sus', nome: 'Agendar SUS', portal: 'sus.agenda', codigoSMS: '310 742', passos: PASSOS_SUS },
+];
+
+/** Nível de confiança da conta na jornada: bronze → prata → ouro. */
+export type NivelConta = 'bronze' | 'prata' | 'ouro';
+
+export const NIVEIS_CONTA: Record<NivelConta, { rotulo: string; cor: string; descricao: string }> = {
+  bronze: {
+    rotulo: 'Bronze',
+    cor: '#b08d57',
+    descricao: 'Você concluiu o caminho básico com segurança. Bela conquista!',
+  },
+  prata: {
+    rotulo: 'Prata',
+    cor: '#7f8b92',
+    descricao: 'Identidade reforçada: leitura facial da CNH, pelo caminho do banco.',
+  },
+  ouro: {
+    rotulo: 'Ouro',
+    cor: '#d4a017',
+    descricao: 'Acesso máximo: leitura facial com o TSE ou QR Code da CIN.',
+  },
+};
+
+/** Os 3 caminhos anunciados pelo botão "Aumentar nível" (tela de conclusão). */
+export const CAMINHOS_NIVEL: { para: NivelConta; fala: string }[] = [
+  { para: 'prata', fala: 'fazer a leitura facial da CNH, pelo caminho do banco' },
+  { para: 'ouro', fala: 'fazer a leitura facial do título de eleitor, do TSE' },
+  { para: 'ouro', fala: 'ler o QR Code da Carteira de Identidade Nacional (CIN)' },
 ];
 
 export const REQUISITOS = {  funcionais: [

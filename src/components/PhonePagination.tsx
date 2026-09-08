@@ -14,7 +14,7 @@ export function PhonePagination({ telaAtual, onTelaChange }: Props) {
   const podeAvancar = indiceAtual < TELAS.length - 1;
 
   return (
-    <div className="ph-pagination">
+    <nav className="ph-pagination" aria-label="Paginação do celular">
       <button
         className="ph-pagination-seta"
         disabled={!podeVoltar}
@@ -22,7 +22,7 @@ export function PhonePagination({ telaAtual, onTelaChange }: Props) {
         aria-label="Tela anterior"
         type="button"
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
           <polyline points="15 18 9 12 15 6" />
         </svg>
       </button>
@@ -33,7 +33,8 @@ export function PhonePagination({ telaAtual, onTelaChange }: Props) {
             key={t}
             className={`ph-pagination-dot ${i === indiceAtual ? 'ativo' : ''}`}
             onClick={() => onTelaChange(t)}
-            aria-label={`Ir para tela ${t}`}
+            aria-label={`Ir para tela ${t} (${i + 1} de ${TELAS.length})`}
+            aria-current={i === indiceAtual ? 'true' : undefined}
             type="button"
           />
         ))}
@@ -46,10 +47,10 @@ export function PhonePagination({ telaAtual, onTelaChange }: Props) {
         aria-label="Próxima tela"
         type="button"
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>
-    </div>
+    </nav>
   );
 }

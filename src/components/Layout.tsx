@@ -44,7 +44,7 @@ export function Layout() {
                 {config.leituraEmVoz ? '🔊 Voz ligada' : '🔇 Voz desligada'}
               </span>
             </button>
-            <Link to="/demonstracao" className="botao botao-primario">
+            <Link to="/demonstracao" className="botao botao-primario botao-cta">
               Começar agora
             </Link>
           </div>
@@ -68,14 +68,22 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="rodape">
-        <p>
-          <strong>IAssistente Intergeracional</strong> — protótipo estático para exemplificação (IFPA Bragança).
-          Código aberto (MIT).
-        </p>
-        <p className="rodape-pequeno">
-          Demonstração com dados fictícios. Nenhum dado real sai do seu aparelho neste protótipo.
-        </p>
+      <footer className="rodape" role="contentinfo">
+        <div className="rodape-interno">
+          <div>
+            <p className="rodape-bloco-titulo">Projeto IFPA Bragança</p>
+            <p>
+              <strong>IAssistente Intergeracional</strong> — protótipo estático para exemplificação (IFPA Bragança).
+              Código aberto (MIT).
+            </p>
+          </div>
+          <div>
+            <p className="rodape-bloco-titulo">Dados fictícios</p>
+            <p className="rodape-pequeno">
+              Demonstração com dados fictícios. Nenhum dado real sai do seu aparelho neste protótipo.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );

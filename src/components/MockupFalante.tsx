@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
 const FALAS = [
-  'Olá! Eu sou o IAssistente. Vou te guiar com calma.',
-  'Toque no botão amarelo "Entrar com Gov.br". Sem pressa.',
-  'Digite seu CPF no espaço com a borda amarela.',
-  'Pronto! Você conseguiu sozinha. Parabéns!',
+  'Oi! Sou a Lia, sua assistente. Vou te guiar com calma.',
+  'Toque no botão amarelo "Entrar com Gov.br". Sem pressa, eu estou aqui.',
+  'Digite seu CPF no espaço com a borda amarela. Vamos juntas!',
+  'Pronto! Você conseguiu sozinha. Estou tão orgulhosa!',
 ];
 
 /** Mockup do celular com a IA "falando" (só texto, encenação da home). */
@@ -30,7 +30,8 @@ export function MockupFalante() {
   }, [nChars, falaIdx]);
 
   return (
-    <div className="celular" aria-label="Exemplo da interface assistiva falando">
+    <div className="celular" role="img" aria-label="Exemplo da interface assistiva falando">
+      <div className="celular-notch" aria-hidden="true" />
       <p className="celular-topo">ENTRAR COM GOV.BR</p>
       <div className="celular-campo-destaque">
         <label htmlFor="demo-cpf-home">Digite seu CPF aqui</label>
@@ -40,7 +41,7 @@ export function MockupFalante() {
         <span aria-hidden="true">🤖 </span>“{FALAS[falaIdx].slice(0, nChars)}
         {nChars < FALAS[falaIdx].length ? '▍' : ''}”
       </p>
-      <span className="celular-botao">Enviar</span>
+      <span className="celular-botao" role="button" tabIndex={0} aria-label="Enviar CPF (demonstração)">Enviar</span>
     </div>
   );
 }

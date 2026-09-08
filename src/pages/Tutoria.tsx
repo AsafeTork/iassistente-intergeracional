@@ -48,9 +48,9 @@ export function Tutoria() {
       <div className="grade">
         {TUTORES.map((t) => (
           <article key={t.id} className="cartao">
-            <h3>
+            <h2>
               {t.nome}, {t.idade} anos
-            </h3>
+            </h2>
             <p>
               {t.escola} • <strong>{t.especialidade}</strong>
             </p>
@@ -59,6 +59,8 @@ export function Tutoria() {
               type="button"
               className={pedido === t.id ? 'botao botao-secundario' : 'botao botao-primario'}
               onClick={() => pedir(t.id)}
+              aria-pressed={pedido === t.id}
+              aria-label={pedido === t.id ? `Pedido feito para ${t.nome}` : `Pedir ajuda de ${t.nome}`}
             >
               {pedido === t.id ? 'Pedido feito ✓' : `Pedir ajuda de ${t.nome.split(' ')[0]}`}
             </button>

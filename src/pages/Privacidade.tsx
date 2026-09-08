@@ -19,7 +19,7 @@ export function Privacidade() {
 
       <div className="grade">
         <article className="cartao">
-          <h3>🔒 O que NUNCA sai do aparelho</h3>
+          <h2>🔒 O que NUNCA sai do aparelho</h2>
           <ul>
             <li>Senhas e códigos SMS</li>
             <li>CPF completo e documentos</li>
@@ -27,7 +27,7 @@ export function Privacidade() {
           </ul>
         </article>
 <article className="cartao">
-          <h3>🔓 Pode sair higienizado</h3>
+          <h2>🔓 Pode sair higienizado</h2>
           <ul>
             <li>Estrutura da tela (botões, textos públicos)</li>
             <li>Qual passo você está ("tela 2 de 5")</li>
@@ -35,7 +35,7 @@ export function Privacidade() {
           </ul>
         </article>
         <article className="cartao">
-          <h3>👁️ Explicabilidade (RNF02)</h3>
+          <h2>👁️ Explicabilidade (RNF02)</h2>
           <p>
             Cada sugestão da IA vem com o motivo em linguagem simples: “destaquei este botão porque é o
             único com o texto Entrar”.
