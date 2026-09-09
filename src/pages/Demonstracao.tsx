@@ -54,6 +54,10 @@ export function Demonstracao() {
     falar(texto, config.leituraEmVoz);
   }
 
+  const ROTEIRO = ['Chegar ao Gov.br', 'Identificar-se (CPF)', 'Senha + código SMS', 'Conta aberta'];
+  const passoRoteiro =
+    telaFone === 'concluido' ? 3 : telaFone === 'login' ? 2 : telaFone === 'govbr' ? 1 : 0;
+
   return (
     <div>
       <p className="migalha">
@@ -65,6 +69,9 @@ export function Demonstracao() {
       <p className="subtitulo">
         Use o celular 3D como se fosse real — ou aperte <strong>Ver sozinho</strong> e
         assista a IA fazer tudo, como se estivesse gerando a solução naquele momento.
+      </p>
+      <p className="selo-demo-gov" role="note" style={{ maxWidth: '42rem' }}>
+        Demonstração acadêmica — não é Gov.br oficial. Dados fictícios: nada sai do seu aparelho.
       </p>
       <div className="acoes-linha" role="group" aria-label="Opções da demonstração">
         {!auto ? (
@@ -98,9 +105,23 @@ export function Demonstracao() {
               <span className="etiqueta"><AIAvatar size="sm" live /> gerando ao vivo…</span>
             )}
           </div>
+          <ol className="roteiro" aria-label="Roteiro da demonstração">
+            {ROTEIRO.map((etapa, i) => (
+              <li
+                key={etapa}
+                className={`roteiro-etapa${i === passoRoteiro ? ' atual' : i < passoRoteiro ? ' feita' : ''}`}
+                aria-current={i === passoRoteiro ? 'step' : undefined}
+              >
+                <span className="roteiro-num" aria-hidden="true">{i + 1}</span> {etapa}
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="painel-tela-3d" aria-label="Emulador 3D do celular">
+          <p className="palco-legenda">
+            <span className="palco-live" aria-hidden="true" /> Toque de verdade — é o fluxo, não um vídeo
+          </p>
           <PhoneEmulator3D mensagem={mensagem}>
             <PhoneScreen
               key={`${servicoId}-${sessao}`}
@@ -119,6 +140,11 @@ export function Demonstracao() {
               setSalto((s) => ({ tela: t, n: s.n + 1 }));
             }}
           />
+          <ul className="palco-chips" aria-label="Garantias da demonstração">
+            <li className="palco-chip">Toque real</li>
+            <li className="palco-chip">Voz da Lia</li>
+            <li className="palco-chip">Dados no aparelho</li>
+          </ul>
         </section>
       </div>
 

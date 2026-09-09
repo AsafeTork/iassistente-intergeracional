@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { BrButton, BrCard, BrInput } from '@govbr-ds/webcomponents-react';
 import '@govbr-ds/core/dist/core-tokens.css';
 import { CAMINHOS_NIVEL, NIVEIS_CONTA, type NivelConta } from '../data/mock';
+import { mascararCPF, soDigitos } from '../lib/documentos';
 import { GovFrame } from './GovFrame';
+import { SeloDemoGov } from './SeloDemoGov';
 
 /**
  * GovbrNativo: tela de login gov.br renderizada com os Web Components REAIS do
@@ -32,6 +34,7 @@ type Props = {
 export function GovbrNativo({ onAvancar, onMensagem }: Props) {
   const [cpf, setCpf] = useState('');
   const [erroCpf, setErroCpf] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [ajudaNivel, setAjudaNivel] = useState<NivelConta | null>(null);
 
   if (!WBC_OK) {
@@ -45,14 +48,19 @@ export function GovbrNativo({ onAvancar, onMensagem }: Props) {
     : [];
 
   function continuar() {
+    if (enviando) return;
     if (numerosCpf.length !== 11) {
       setErroCpf(true);
-      onMensagem?.('Parece que faltou algum número do CPF. Digite os 11 números para continuar.');
+      onMensagem?.('Parece que faltou algum número do CPF. Vamos conferir juntos, sem pressa — conte 11 números comigo.');
       return;
     }
     setErroCpf(false);
-    onMensagem?.('Muito bem! Continuando.');
-    onAvancar?.();
+    setEnviando(true);
+    window.setTimeout(() => {
+      setEnviando(false);
+      onMensagem?.('Muito bem! Continuando.');
+      onAvancar?.();
+    }, 450);
   }
 
   function mostrarCaminho(id: NivelConta) {
@@ -78,6 +86,7 @@ export function GovbrNativo({ onAvancar, onMensagem }: Props) {
         </button>
       </header>
       <div className="ph-govbr-faixa" />
+      <SeloDemoGov />
 
       <main className="ph-govbr-conteudo">
         <h1 className="ph-govbr-titulo">Identifique-se no gov.br com:</h1>
@@ -90,9 +99,11 @@ export function GovbrNativo({ onAvancar, onMensagem }: Props) {
                 placeholder="Digite seu CPF para criar ou acessar sua conta gov.br"
                 type="text"
                 inputMode="numeric"
+                value={mascararCPF(cpf)}
+                maxlength={14}
                 onValueChange={(e) => {
-                  setCpf(String(e.detail ?? ''));
-                  if (erroCpf) setErroCpf(false);
+                  setCpf(mascararCPF(String(e.detail ?? '')));
+                  if (erroCpf && soDigitos(String(e.detail ?? '')).length === 11) setErroCpf(false);
                 }}
                 state={erroCpf ? ('danger' as const) : undefined}
               />

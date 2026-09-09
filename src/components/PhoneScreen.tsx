@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CAMINHOS_NIVEL, NIVEIS_CONTA, SERVICOS_DEMO, type NivelConta, type ServicoDemo } from '../data/mock';
 import { falar, useAcessibilidade } from '../hooks/useAcessibilidade';
+import { codigoValido, cpfValido, mascararCPF, senhaValida, soDigitos } from '../lib/documentos';
 import { traduzirErro } from '../lib/tradutorErros';
 import { AIScanHighlight } from './AIScanHighlight';
 import { GovbrNativo } from './GovbrNativo';
 import { LoadingAcessivel } from './LoadingAcessivel';
 import { NotificacaoAndroid } from './NotificacaoAndroid';
+import { SeloDemoGov } from './SeloDemoGov';
 import { Skeleton } from './Skeleton';
 
 type Tela = 'home' | 'navegador' | 'govbr' | 'login' | 'concluido';
@@ -270,6 +272,8 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   const [indice, setIndice] = useState(0);
   const [valor, setValor] = useState('');
   const [mostrarErro, setMostrarErro] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [codigoExpirado, setCodigoExpirado] = useState(false);
   const [scanIndex, setScanIndex] = useState(-1);
   const [notif, setNotif] = useState<'oculta' | 'pip' | 'aberta'>('oculta');
   const [nivelAberto, setNivelAberto] = useState(false);
@@ -286,6 +290,8 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   // Navegação com aviso externo (paginação do mockup).
   function setTela(t: Tela) {
     setTelaEstado(t);
+    setEnviando(false);
+    setCodigoExpirado(false);
     telaMudaRef.current?.(t);
   }
 
@@ -294,6 +300,8 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   useEffect(() => {
     if (saltoN === 0) return;
     setMostrarErro(false);
+    setEnviando(false);
+    setCodigoExpirado(false);
     setNotif('oculta');
     if (salto?.tela === 'login') {
       setIndice(0);
@@ -457,11 +465,59 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
     setIndice(0);
     setValor('');
     setMostrarErro(false);
+    setEnviando(false);
+    setCodigoExpirado(false);
     anunciar(`Tela de login: ${servico.nome}. ${passos[0].titulo}. ${passos[0].instrucaoAmigavel}`);
+  }
+
+  /** Máscara visual por tipo de campo (dados nunca saem do aparelho). */
+  function tratarValor(tipo: string | undefined, texto: string): string {
+    if (tipo === 'cpf') return mascararCPF(texto);
+    if (tipo === 'codigo') return soDigitos(texto).slice(0, 6);
+    return texto;
+  }
+
+  /** Validação local do passo atual; erro vira frase acolhedora, sem pressa. */
+  function valorValido(tipo: string | undefined, texto: string): boolean {
+    if (tipo === 'cpf') return cpfValido(texto);
+    if (tipo === 'senha') return senhaValida(texto);
+    if (tipo === 'codigo') return codigoValido(texto);
+    return texto.trim().length > 0;
+  }
+
+  function passoValido(): boolean {
+    if (!passo?.campo) return true;
+    return valorValido(passo.campo.tipo, valor);
+  }
+
+  /** Enviar com guard anti-duplo-toque: valida, mostra erro acolhedor ou avança. */
+  function enviar() {
+    if (enviando) return;
+    if (!passoValido()) {
+      setMostrarErro(true);
+      if (passo?.campo?.tipo === 'codigo') setCodigoExpirado(true);
+      anunciar(passo?.erroAmigavel ?? 'Vamos conferir juntos, sem pressa.');
+      return;
+    }
+    setEnviando(true);
+    window.setTimeout(() => {
+      setEnviando(false);
+      avancar();
+    }, 450);
+  }
+
+  /** Código venceu: gera outro ciclo de SMS e espera, sem pressa. */
+  function reenviarCodigo() {
+    setValor('');
+    setMostrarErro(false);
+    setCodigoExpirado(false);
+    setNotif('pip');
+    anunciar('Mandei outro código para você. Vou esperar aqui, sem pressa.');
   }
 
   function avancar() {
     setMostrarErro(false);
+    setCodigoExpirado(false);
     if (indice < passos.length - 1) {
       const novo = indice + 1;
       setIndice(novo);
@@ -475,14 +531,16 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
   }
 
   function voltar() {
-    if (indice === 0) return;
+    if (indice === 0 || enviando) return;
     setMostrarErro(false);
+    setCodigoExpirado(false);
     setValor('');
     setIndice(indice - 1);
   }
 
   function simularErro() {
     setMostrarErro(true);
+    if (passo?.campo?.tipo === 'codigo') setCodigoExpirado(true);
     if (passo.erroAmigavel) anunciar(passo.erroAmigavel);
   }
 
@@ -586,6 +644,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
     const nivelAtual = NIVEIS_CONTA[nivel];
     return (
       <div className="ph-sucesso">
+        <SeloDemoGov />
         <div className="ph-sucesso-icone"><Estrela /></div>
         <h3>Conta aberta!</h3>
         <p>Você concluiu {servico.nome} com sucesso.</p>
@@ -603,13 +662,8 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
                 const caminhos = CAMINHOS_NIVEL.map(
                   (c) => `${NIVEIS_CONTA[c.para].rotulo}: ${c.fala}`,
                 ).join('. ');
-                anunciar(`Para aumentar o nível da sua conta, você pode: ${caminhos}. Vou recomeçar a demonstração.`);
-                setNivelAberto(false);
-                setMostrarErro(false);
-                setNotif('oculta');
-                setIndice(0);
-                setValor('');
-                setTela('home');
+                anunciar(`Para aumentar o nível da sua conta, você pode: ${caminhos}.`);
+                setNivelAberto(true);
               }}
             >
               <SobeNivel /> Aumentar nível
@@ -670,6 +724,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
         </button>
       </div>
       <div style={{ height: 2, background: 'var(--amarelo)', flexShrink: 0 }} />
+      <SeloDemoGov />
       <div style={{ padding: '10px 16px 0', textAlign: 'left' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--azul)' }}>Entrar com gov.br</span>
       </div>
@@ -700,8 +755,16 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
               id={`campo-${passo.id}`}
               name={passo.campo.tipo === 'cpf' ? 'cpf' : passo.campo.tipo === 'senha' ? 'password' : passo.campo.tipo === 'codigo' ? 'codigo' : passo.id}
               value={valor}
-              onChange={(e) => setValor(e.target.value)}
+              onChange={(e) => {
+                const novo = tratarValor(passo.campo?.tipo, e.target.value);
+                setValor(novo);
+                if (mostrarErro && valorValido(passo.campo?.tipo, novo)) {
+                  setMostrarErro(false);
+                  if (passo.campo?.tipo === 'codigo') setCodigoExpirado(false);
+                }
+              }}
               placeholder={passo.campo.exemplo}
+              maxLength={passo.campo.tipo === 'cpf' ? 14 : passo.campo.tipo === 'codigo' ? 6 : 64}
               inputMode={passo.campo.tipo === 'senha' ? 'text' : 'numeric'}
               type={passo.campo.tipo === 'senha' ? 'password' : 'text'}
               autoComplete={passo.campo.tipo === 'cpf' ? 'username' : passo.campo.tipo === 'senha' ? 'current-password' : passo.campo.tipo === 'codigo' ? 'one-time-code' : 'off'}
@@ -715,9 +778,14 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
               </p>
             )}
             <small style={{ display: 'block', marginTop: 6, color: 'var(--texto-secundario)', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
-            <button className="ph-btn ph-btn-primario" onClick={avancar} style={{ marginTop: 10, width: '100%' }}>
-              Enviar
+            <button className="ph-btn ph-btn-primario" onClick={enviar} disabled={enviando} style={{ marginTop: 10, width: '100%' }}>
+              {enviando ? 'Enviando…' : 'Enviar'}
             </button>
+            {passo.campo.tipo === 'codigo' && (
+              <button type="button" className="ph-btn-reenviar" onClick={reenviarCodigo} disabled={enviando}>
+                Mandar outro código
+              </button>
+            )}
           </div>
         </AIScanHighlight>
       ) : (
@@ -747,15 +815,20 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
             <span className="ph-login-erro-icon"><Robot /></span>
             <span>{passo.erroAmigavel}</span>
           </div>
+          {passo.campo?.tipo === 'codigo' && (mostrarErro || codigoExpirado) && (
+            <button type="button" className="ph-btn-reenviar" onClick={reenviarCodigo} disabled={enviando}>
+              Mandar outro código
+            </button>
+          )}
         </div>
       )}
 
       <div className="ph-login-botoes">
-        <button className="ph-btn ph-btn-secundario" onClick={voltar} disabled={indice === 0}>
+        <button className="ph-btn ph-btn-secundario" onClick={voltar} disabled={indice === 0 || enviando}>
           <SetaEsq /> Voltar
         </button>
         <AIScanHighlight delay={0.4} label="continuar">
-          <button className="ph-btn ph-btn-primario" onClick={avancar}>
+          <button className="ph-btn ph-btn-primario" onClick={() => { if (passo.campo) enviar(); else avancar(); }} disabled={enviando}>
           {indice === passos.length - 1
             ? <><Estrela /> Concluir</>
             : <>Continuar <SetaDir /></>}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SeloDemoGov } from './SeloDemoGov';
 
 const FALAS = [
   'Oi! Sou a Lia, sua assistente. Vou te guiar com calma.',
@@ -30,8 +31,9 @@ export function MockupFalante() {
   }, [nChars, falaIdx]);
 
   return (
-    <div className="celular" role="img" aria-label="Exemplo da interface assistiva falando">
+    <div className="celular" role="img" aria-label="Exemplo da interface assistiva falando. Demonstração acadêmica, não é Gov.br oficial.">
       <div className="celular-notch" aria-hidden="true" />
+      <SeloDemoGov />
       <p className="celular-topo">ENTRAR COM GOV.BR</p>
       <div className="celular-campo-destaque">
         <label htmlFor="demo-cpf-home">Digite seu CPF aqui</label>
@@ -41,7 +43,7 @@ export function MockupFalante() {
         <span aria-hidden="true">🤖 </span>“{FALAS[falaIdx].slice(0, nChars)}
         {nChars < FALAS[falaIdx].length ? '▍' : ''}”
       </p>
-      <span className="celular-botao" role="button" tabIndex={0} aria-label="Enviar CPF (demonstração)">Enviar</span>
+      <span className="celular-botao" aria-hidden="true">Enviar</span>
     </div>
   );
 }
