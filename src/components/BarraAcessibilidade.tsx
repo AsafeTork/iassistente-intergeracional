@@ -27,7 +27,6 @@ export function BarraAcessibilidade() {
           setLibrasInicializado(true);
         }
       } catch {
-        /* vLibras indisponível: desmarca o toggle */
         alternar('libras');
       }
     } else if (!config.libras && librasInicializado) {
@@ -43,22 +42,24 @@ export function BarraAcessibilidade() {
   }, [config.libras, librasInicializado, alternar]);
 
   return (
-    <section className="barra-acess" aria-label="Opções rápidas de acessibilidade" aria-live="polite">
-      {ITENS.map((item) => {
-        const ativo = config[item.chave];
-        return (
-          <button
-            key={item.chave}
-            type="button"
-            className={ativo ? 'chip chip-ativo' : 'chip'}
-            aria-pressed={ativo}
-            title={item.descricao}
-            onClick={() => alternar(item.chave)}
-          >
-            {item.rotulo}
-          </button>
-        );
-      })}
+    <section className="bg-light border rounded-3 p-3 mb-4" aria-label="Opções rápidas de acessibilidade" aria-live="polite">
+      <div className="btn-group flex-wrap gap-2" role="group">
+        {ITENS.map((item) => {
+          const ativo = config[item.chave];
+          return (
+            <button
+              key={item.chave}
+              type="button"
+              className={`btn ${ativo ? 'btn-primary' : 'btn-outline-primary'} ${ativo ? 'active' : ''}`}
+              aria-pressed={ativo}
+              title={item.descricao}
+              onClick={() => alternar(item.chave)}
+            >
+              {item.rotulo}
+            </button>
+          );
+        })}
+      </div>
     </section>
   );
 }

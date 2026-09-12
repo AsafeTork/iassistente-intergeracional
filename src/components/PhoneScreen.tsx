@@ -656,7 +656,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
             <p className="ph-nivel-desc">{nivelAtual.descricao}</p>
             <button
               type="button"
-              className="ph-btn ph-btn-secundario ph-nivel-toggle"
+              className="ph-btn btn btn-outline-primary ph-nivel-toggle"
               aria-expanded={nivelAberto}
               onClick={() => {
                 const caminhos = CAMINHOS_NIVEL.map(
@@ -680,7 +680,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
           </div>
         )}
         <AIScanHighlight delay={0.5} cor="var(--verde)">
-          <button className="ph-btn ph-btn-primario" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
+          <button className="ph-btn btn btn-warning" onClick={() => { setTela('home'); setIndice(0); setValor(''); }}>
             Voltar ao início
           </button>
         </AIScanHighlight>
@@ -770,19 +770,20 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
               autoComplete={passo.campo.tipo === 'cpf' ? 'username' : passo.campo.tipo === 'senha' ? 'current-password' : passo.campo.tipo === 'codigo' ? 'one-time-code' : 'off'}
               aria-invalid={mostrarErro || undefined}
               aria-describedby={mostrarErro && textoTraduzidoErro ? `erro-${passo.id}` : undefined}
-              style={{ width: '100%', fontSize: '0.95rem', padding: '10px 12px', borderRadius: 6, border: `3px solid ${mostrarErro ? 'var(--vermelho)' : 'var(--amarelo)'}`, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', color: 'var(--texto)', background: 'var(--fundo)' }}
-            />
+className={`form-control ${mostrarErro ? 'is-invalid' : ''}`}
+               style={{ borderColor: mostrarErro ? 'var(--vermelho)' : 'var(--amarelo)' }}
+             />
             {mostrarErro && textoTraduzidoErro && (
-              <p id={`erro-${passo.id}`} className="ph-login-campo-erro">
+              <p id={`erro-${passo.id}`} className="ph-login-campo-erro invalid-feedback">
                 {textoTraduzidoErro}
               </p>
             )}
             <small style={{ display: 'block', marginTop: 6, color: 'var(--texto-secundario)', fontSize: '0.58rem' }}><Cadeado /> Dados ficam só neste aparelho</small>
-            <button className="ph-btn ph-btn-primario" onClick={enviar} disabled={enviando} style={{ marginTop: 10, width: '100%' }}>
+            <button className="ph-btn btn btn-warning" onClick={enviar} disabled={enviando} style={{ marginTop: 10, width: '100%' }}>
               {enviando ? 'Enviando…' : 'Enviar'}
             </button>
             {passo.campo.tipo === 'codigo' && (
-              <button type="button" className="ph-btn-reenviar" onClick={reenviarCodigo} disabled={enviando}>
+              <button type="button" className="ph-btn btn btn-link" onClick={reenviarCodigo} disabled={enviando}>
                 Mandar outro código
               </button>
             )}
@@ -816,7 +817,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
             <span>{passo.erroAmigavel}</span>
           </div>
           {passo.campo?.tipo === 'codigo' && (mostrarErro || codigoExpirado) && (
-            <button type="button" className="ph-btn-reenviar" onClick={reenviarCodigo} disabled={enviando}>
+            <button type="button" className="ph-btn btn btn-link" onClick={reenviarCodigo} disabled={enviando}>
               Mandar outro código
             </button>
           )}
@@ -824,11 +825,11 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
       )}
 
       <div className="ph-login-botoes">
-        <button className="ph-btn ph-btn-secundario" onClick={voltar} disabled={indice === 0 || enviando}>
+        <button className="ph-btn btn btn-outline-primary" onClick={voltar} disabled={indice === 0 || enviando}>
           <SetaEsq /> Voltar
         </button>
         <AIScanHighlight delay={0.4} label="continuar">
-          <button className="ph-btn ph-btn-primario" onClick={() => { if (passo.campo) enviar(); else avancar(); }} disabled={enviando}>
+          <button className="ph-btn btn btn-warning" onClick={() => { if (passo.campo) enviar(); else avancar(); }} disabled={enviando}>
           {indice === passos.length - 1
             ? <><Estrela /> Concluir</>
             : <>Continuar <SetaDir /></>}
@@ -837,7 +838,7 @@ export function PhoneScreen({ onMensagem, servicoId = 'govbr', auto = false, onA
       </div>
 
       {passo.erroAmigavel && !mostrarErro && (
-        <button className="ph-btn ph-btn-erro" onClick={simularErro}>
+        <button className="ph-btn btn btn-outline-danger" onClick={simularErro}>
           <Alerta /> Simular erro do portal
         </button>
       )}

@@ -17,46 +17,52 @@ export function Privacidade() {
         dados de saúde <em>antes</em> de qualquer envio à nuvem. O tutor humano também não tem acesso.
       </p>
 
-      <div className="grade">
-        <article className="cartao">
-          <h2>🔒 O que NUNCA sai do aparelho</h2>
-          <ul>
-            <li>Senhas e códigos SMS</li>
-            <li>CPF completo e documentos</li>
-            <li>Dados de saúde</li>
-          </ul>
+      <div className="row g-3">
+        <article className="col-md-4 card">
+          <div className="card-body">
+            <h2 className="h5">🔒 O que NUNCA sai do aparelho</h2>
+            <ul className="list-unstyled">
+              <li>Senhas e códigos SMS</li>
+              <li>CPF completo e documentos</li>
+              <li>Dados de saúde</li>
+            </ul>
+          </div>
         </article>
-<article className="cartao">
-          <h2>🔓 Pode sair higienizado</h2>
-          <ul>
-            <li>Estrutura da tela (botões, textos públicos)</li>
-            <li>Qual passo você está ("tela 2 de 5")</li>
-            <li>Erros genéricos para traduzir</li>
-          </ul>
+        <article className="col-md-4 card">
+          <div className="card-body">
+            <h2 className="h5">🔓 Pode sair higienizado</h2>
+            <ul className="list-unstyled">
+              <li>Estrutura da tela (botões, textos públicos)</li>
+              <li>Qual passo você está ("tela 2 de 5")</li>
+              <li>Erros genéricos para traduzir</li>
+            </ul>
+          </div>
         </article>
-        <article className="cartao">
-          <h2>👁️ Explicabilidade (RNF02)</h2>
-          <p>
-            Cada sugestão da IA vem com o motivo em linguagem simples: “destaquei este botão porque é o
-            único com o texto Entrar”.
-          </p>
+        <article className="col-md-4 card">
+          <div className="card-body">
+            <h2 className="h5">👁️ Explicabilidade (RNF02)</h2>
+            <p>
+              Cada sugestão da IA vem com o motivo em linguagem simples: "destaquei este botão porque é o
+              único com o texto Entrar".
+            </p>
+          </div>
         </article>
       </div>
 
       <section className="secao" aria-label="Demonstração do filtro">
-        <h2>Veja o filtro trabalhando (de verdade, neste aparelho)</h2>
-        <p className="secao-sub">
+        <h2 className="h3">Veja o filtro trabalhando (de verdade, neste aparelho)</h2>
+        <p className="text-muted">
           O exemplo abaixo passa pelo <strong>mesmo código</strong> que protege o app
           ({demo.removidos} campos removidos: {demo.categorias.join(', ')}).
         </p>
-        <div className="filtro-demo">
-          <div>
-            <h3>Antes (tela bruta — nunca sai)</h3>
-            <pre>{EXEMPLO_BRUTO}</pre>
+        <div className="row g-3">
+          <div className="col-md-6">
+            <h4>Antes (tela bruta — nunca sai)</h4>
+            <pre className="bg-light p-3 rounded border">{EXEMPLO_BRUTO}</pre>
           </div>
-          <div>
-            <h3>Depois (higienizado → nuvem)</h3>
-            <pre>{demo.higienizado}</pre>
+          <div className="col-md-6">
+            <h4>Depois (higienizado → nuvem)</h4>
+            <pre className="bg-light p-3 rounded border">{demo.higienizado}</pre>
           </div>
         </div>
       </section>

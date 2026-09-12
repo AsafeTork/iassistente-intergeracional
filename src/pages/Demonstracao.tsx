@@ -70,22 +70,22 @@ export function Demonstracao() {
         Use o celular 3D como se fosse real — ou aperte <strong>Ver sozinho</strong> e
         assista a IA fazer tudo, como se estivesse gerando a solução naquele momento.
       </p>
-      <p className="selo-demo-gov" role="note" style={{ maxWidth: '42rem' }}>
+      <p className="selo-demo-gov badge bg-primary mb-3" role="note" style={{ maxWidth: '42rem' }}>
         Demonstração acadêmica — não é Gov.br oficial. Dados fictícios: nada sai do seu aparelho.
       </p>
-      <div className="acoes-linha" role="group" aria-label="Opções da demonstração">
+      <div className="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="Opções da demonstração">
         {!auto ? (
-          <button type="button" className="botao botao-primario" onClick={iniciarAuto}>
+          <button type="button" className="btn btn-primary" onClick={iniciarAuto}>
             ▶ Ver sozinho (automático)
           </button>
         ) : (
-          <button type="button" className="botao botao-aviso" onClick={() => pararAuto()}>
+          <button type="button" className="btn btn-warning" onClick={() => pararAuto()}>
             ■ Parar e assumir
           </button>
         )}
-        <label className="demo-servico">
+        <label className="d-flex align-items-center gap-2">
           Serviço:
-          <select value={servicoId} onChange={(e) => { setServicoId(e.target.value); setAuto(false); }} aria-label="Escolher serviço demonstrado">
+          <select value={servicoId} onChange={(e) => { setServicoId(e.target.value); setAuto(false); }} aria-label="Escolher serviço demonstrado" className="form-select">
             {SERVICOS_DEMO.map((s) => (
               <option key={s.id} value={s.id}>{s.nome}</option>
             ))}
@@ -97,8 +97,8 @@ export function Demonstracao() {
         <section className="painel-assistente" aria-live="polite" aria-label="Assistente">
           <p className="etiqueta"><AIAvatar size="sm" /> Assistente Lia diz:</p>
           <p className="fala-grande">"{mensagem}"</p>
-          <div className="acoes-linha">
-            <button type="button" className="botao botao-secundario" onClick={() => anunciar(mensagem)}>
+          <div className="d-flex flex-wrap gap-2 mb-2">
+            <button type="button" className="btn btn-secondary" onClick={() => anunciar(mensagem)}>
               <VolumeIcon /> Ouvir de novo
             </button>
             {auto && (
@@ -140,7 +140,7 @@ export function Demonstracao() {
               setSalto((s) => ({ tela: t, n: s.n + 1 }));
             }}
           />
-          <ul className="palco-chips" aria-label="Garantias da demonstração">
+          <ul className="list-unstyled d-flex gap-2 palco-chips" aria-label="Garantias da demonstração">
             <li className="palco-chip">Toque real</li>
             <li className="palco-chip">Voz da Lia</li>
             <li className="palco-chip">Dados no aparelho</li>
@@ -149,7 +149,7 @@ export function Demonstracao() {
       </div>
 
       <section className="demo-info-lateral" aria-label="Ajuda sobre a demonstração">
-        <div className="demo-info-card">
+        <div className="card mb-3">
           <h2>Como usar</h2>
           <ul>
             <li>Toque nos <strong>ícones</strong> do celular para navegar</li>
@@ -158,7 +158,7 @@ export function Demonstracao() {
             <li>Clique em <strong>"Ouvir de novo"</strong> para repetir a instrução</li>
           </ul>
         </div>
-        <div className="demo-info-card">
+        <div className="card mb-3">
           <h2>O que está sendo demonstrado</h2>
           <ul>
             <li>Tela inicial com apps (como um celular real)</li>
@@ -171,3 +171,4 @@ export function Demonstracao() {
     </div>
   );
 }
+

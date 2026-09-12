@@ -83,10 +83,10 @@ export function Home() {
           <p className="subtitulo anim-hero anim-hero-3">
             Voz calma e letra grande para usar portais como o <strong>Gov.br</strong> sozinho, com segurança e sem medo.
           </p>
-          <div className="acoes anim-hero anim-hero-4">
+          <div className="acoes anim-hero anim-hero-4 d-flex flex-wrap gap-2">
             <Link
               to="/demonstracao"
-              className="botao botao-primario botao-grande"
+              className="btn btn-primary btn-lg"
               onClick={() =>
                 falar('Vamos começar a demonstração do login com ajuda passo a passo.', config.leituraEmVoz)
               }
@@ -94,10 +94,10 @@ export function Home() {
               Ver demonstração <span className="seta" aria-hidden="true"><SetaCtaIcon /></span>
             </Link>
           </div>
-          <ul className="selos anim-hero anim-hero-5" aria-label="Benefícios">
-            <li><CheckIcon /> Funciona no navegador, sem instalar nada</li>
-            <li><LockIcon /> Suas senhas ficam só no seu aparelho</li>
-            <li><PessoasIcon /> Tutoria reversa: jovens ensinam, todos aprendem</li>
+          <ul className="selos list-unstyled anim-hero anim-hero-5" aria-label="Benefícios">
+            <li className="mb-2"><CheckIcon /> Funciona no navegador, sem instalar nada</li>
+            <li className="mb-2"><LockIcon /> Suas senhas ficam só no seu aparelho</li>
+            <li className="mb-2"><PessoasIcon /> Tutoria reversa: jovens ensinam, todos aprendem</li>
           </ul>
         </div>
 
@@ -107,22 +107,22 @@ export function Home() {
       </section>
 
       <section className="secao reveal" aria-labelledby="tit-servicos">
-        <h2 id="tit-servicos">O que o assistente ajuda a fazer</h2>
+        <h2 id="tit-servicos" className="h3">O que o assistente ajuda a fazer</h2>
         <p className="secao-sub">Exemplos de serviços guiados passo a passo (dados fictícios).</p>
-        <div className="grade">
+        <div className="grade row g-3">
           {SERVICOS.map((s, i) => (
             <article
               key={s.id}
-              className={i === 0 ? 'cartao cartao-destaque anim-entrada' : 'cartao anim-entrada'}
+              className={`col-md-6 ${i === 0 ? 'col-md-7' : 'col-md-5'} ${i === 0 ? 'card border-start border-4 border-primary' : 'card'} animate-entrada`}
               style={{ animationDelay: `${Math.min(i, 7) * 80}ms` }}
             >
-              {i === 0 && <span className="cartao-badge">Mais pedido</span>}
-              <p className="cartao-cat">{s.categoria}</p>
-              <h3>{s.nome}</h3>
-              <p className="cartao-meta">
+              {i === 0 && <span className="badge bg-primary mb-2">Mais pedido</span>}
+              <p className="text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.08em', color: 'var(--mar-tinta)', fontWeight: 700 }}>{s.categoria}</p>
+              <h3 className="h5">{s.nome}</h3>
+              <p className="text-muted">
                 {s.passos} passos • <strong>{s.dificuldade}</strong>
               </p>
-              <Link to="/demonstracao" className="cartao-link">
+              <Link to="/demonstracao" className="btn btn-sm btn-primary">
                 Guiar agora <SetaDirIcon />
               </Link>
             </article>
@@ -130,14 +130,14 @@ export function Home() {
         </div>
       </section>
 
-      <section className="secao faixa" aria-labelledby="tit-tutoria">
+      <section className="secao faixa alert alert-primary mb-0" aria-labelledby="tutoria">
         <div>
-          <h2 id="tit-tutoria">Tutoria reversa</h2>
-          <p>
+          <h2 id="tit-tutoria" className="h3">Tutoria reversa</h2>
+          <p className="mb-3">
             Jovens voluntários ensinam os primeiros passos, sem ver suas senhas. Depois de 3 tarefas feitas sozinho, você ganha o selo{' '}
             <strong>"Independente Digital"</strong>.
           </p>
-          <Link to="/tutoria" className="botao botao-primario faixa-cta">
+          <Link to="/tutoria" className="btn btn-primary btn-lg">
             Conhecer tutores
           </Link>
         </div>

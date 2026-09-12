@@ -15,82 +15,90 @@ export function Layout() {
   const { config, alternar } = useAcessibilidade();
 
   return (
-    <div className="app">
+    <div className="d-flex flex-column min-vh-100">
       <a className="pular" href="#conteudo">
         Pular para o conteúdo
       </a>
 
-      <header className="topo" role="banner">
-        <div className="topo-interno">
-          <Link to="/" className="marca" aria-label="IAssistente Intergeracional — início">
-            <span className="marca-icone" aria-hidden="true">
+      <header className="navbar navbar-expand-lg navbar-dark sticky-top" role="banner" style={{ background: 'var(--mar)' }}>
+        <div className="container">
+          <Link to="/" className="navbar-brand d-flex align-items-center gap-2" aria-label="IAssistente Intergeracional — início">
+            <span className="marca-icone" aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--cupuacu)' }}>
               IA
             </span>
             <span className="marca-texto">
               <strong>IAssistente</strong>
-              <small>Intergeracional</small>
+              <small className="d-block" style={{ fontSize: '0.7rem', opacity: 0.8 }}>Intergeracional</small>
             </span>
           </Link>
 
-          <div className="topo-acoes">
-            <button
-              type="button"
-              className="botao-voz"
-              aria-pressed={config.leituraEmVoz}
-              onClick={() => alternar('leituraEmVoz')}
-              title="Ativar ou desativar leitura em voz alta"
-            >
-              <span role="status">
-                {config.leituraEmVoz ? '🔊 Voz ligada' : '🔇 Voz desligada'}
-              </span>
-            </button>
-            <Link to="/demonstracao" className="botao botao-primario botao-cta">
-              Começar agora
-            </Link>
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Menu de navegação">
+            <span className="navbar-toggler-icon" />
+          </button>
+
+          <div className="collapse navbar-collapse" id="navMenu">
+            <nav className="navbar-nav ms-auto" aria-label="Navegação principal">
+              {ROTAS.map((r) => (
+                <NavLink
+                  key={r.para}
+                  to={r.para}
+                  end={r.para === '/'}
+                  className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  style={{ color: 'var(--paper)', fontWeight: 600 }}
+                >
+                  {({ isActive }) => (
+                    <span aria-current={isActive ? 'page' : undefined}>{r.rotulo}</span>
+                  )}
+                </NavLink>
+              ))}
+            </nav>
+            <div className="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-light"
+                aria-pressed={config.leituraEmVoz}
+                onClick={() => alternar('leituraEmVoz')}
+                title="Ativar ou desativar leitura em voz alta"
+              >
+                <span role="status">
+                  {config.leituraEmVoz ? '🔊 Voz ligada' : '🔇 Voz desligada'}
+                </span>
+              </button>
+              <Link to="/demonstracao" className="btn btn-primary">
+                Começar agora
+              </Link>
+            </div>
           </div>
         </div>
-
-        <nav className="menu" aria-label="Navegação principal">
-          {ROTAS.map((r) => (
-            <NavLink
-              key={r.para}
-              to={r.para}
-              end={r.para === '/'}
-              className={({ isActive }) => (isActive ? 'menu-link ativo' : 'menu-link')}
-            >
-              {({ isActive }) => (
-                <span aria-current={isActive ? 'page' : undefined}>{r.rotulo}</span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
       </header>
 
-      <main id="conteudo" className="conteudo" tabIndex={-1}>
+      <main id="conteudo" className="flex-grow-1" tabIndex={-1}>
         <Outlet />
       </main>
 
-      <footer className="rodape" role="contentinfo">
-        <div className="rodape-interno">
-          <div>
-            <p className="rodape-bloco-titulo">Projeto IFPA Bragança</p>
-            <p>
-              <strong>IAssistente Intergeracional</strong> — protótipo estático para exemplificação (IFPA Bragança).
-              Código aberto (MIT).
-            </p>
+      <footer className="bg-dark text-light py-4 mt-auto" role="contentinfo">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6">
+              <p className="fw-bold mb-1">Projeto IFPA Bragança</p>
+              <p className="mb-0">
+                <strong>IAssistente Intergeracional</strong> — protótipo estático para exemplificação (IFPA Bragança).
+                Código aberto (MIT).
+              </p>
+            </div>
+            <div className="col-md-6">
+              <p className="fw-bold mb-1">Dados fictícios</p>
+              <p className="small mb-0" style={{ opacity: 0.8 }}>
+                Demonstração com dados fictícios. Nenhum dado real sai do seu aparelho neste protótipo.
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="rodape-bloco-titulo">Dados fictícios</p>
-            <p className="rodape-pequeno">
-              Demonstração com dados fictícios. Nenhum dado real sai do seu aparelho neste protótipo.
-            </p>
-          </div>
+          <nav aria-label="Voltar ao topo" className="mt-3">
+            <a href="#conteudo" className="text-light" style={{ textDecoration: 'underline' }}>
+              ↑ Voltar ao início
+            </a>
+          </nav>
         </div>
-        <nav aria-label="Voltar ao topo" className="rodape-topo">
-          <a href="#conteudo" className="rodape-topo-link">
-            ↑ Voltar ao início
-          </a>
-        </nav>
       </footer>
     </div>
   );

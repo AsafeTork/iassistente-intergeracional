@@ -36,8 +36,8 @@ export function Tutoria() {
       </p>
 
       {tutorEscolhido && (
-        <section className="selo-sucesso" aria-live="polite">
-          <h2>✅ Pedido registrado para {tutorEscolhido.nome}!</h2>
+        <section className="alert alert-success mb-4" aria-live="polite">
+          <h2 className="h4">✅ Pedido registrado para {tutorEscolhido.nome}!</h2>
           <p>
             {nome ? `Obrigado, ${nome}! ` : ''}No app real, {tutorEscolhido.nome} receberia um aviso e
             marcaria uma videochamada guiada. Aqui o pedido ficou salvo neste navegador (demonstração).
@@ -45,43 +45,47 @@ export function Tutoria() {
         </section>
       )}
 
-      <div className="grade">
+      <div className="row g-3">
         {TUTORES.map((t) => (
-          <article key={t.id} className="cartao">
-            <h2>
-              {t.nome}, {t.idade} anos
-            </h2>
-            <p>
-              {t.escola} • <strong>{t.especialidade}</strong>
-            </p>
-            <p>⭐ {t.avaliacao.toFixed(1)} — avaliado por idosos atendidos</p>
-            <button
-              type="button"
-              className={pedido === t.id ? 'botao botao-secundario' : 'botao botao-primario'}
-              onClick={() => pedir(t.id)}
-              aria-pressed={pedido === t.id}
-              aria-label={pedido === t.id ? `Pedido feito para ${t.nome}` : `Pedir ajuda de ${t.nome}`}
-            >
-              {pedido === t.id ? 'Pedido feito ✓' : `Pedir ajuda de ${t.nome.split(' ')[0]}`}
-            </button>
+          <article key={t.id} className="col-md-4 card">
+            <div className="card-body">
+              <h3 className="h5">
+                {t.nome}, {t.idade} anos
+              </h3>
+              <p className="text-muted">
+                {t.escola} • <strong>{t.especialidade}</strong>
+              </p>
+              <p>⭐ {t.avaliacao.toFixed(1)} — avaliado por idosos atendidos</p>
+              <button
+                type="button"
+                className={`btn ${pedido === t.id ? 'btn-secondary' : 'btn-primary'}`}
+                onClick={() => pedir(t.id)}
+                aria-pressed={pedido === t.id}
+                aria-label={pedido === t.id ? `Pedido feito para ${t.nome}` : `Pedir ajuda de ${t.nome}`}
+              >
+                {pedido === t.id ? 'Pedido feito ✓' : `Pedir ajuda de ${t.nome.split(' ')[0]}`}
+              </button>
+            </div>
           </article>
         ))}
       </div>
 
       <section className="secao" aria-labelledby="tit-nome">
-        <h2 id="tit-nome">Como quer ser chamado?</h2>
-        <label className="rotulo" htmlFor="nome-idoso">
+        <h2 id="tit-nome" className="h3">Como quer ser chamado?</h2>
+        <label htmlFor="nome-idoso" className="form-label">
           Seu primeiro nome (opcional, fica só neste aparelho)
         </label>
         <input
           id="nome-idoso"
-          className="entrada"
+          type="text"
+          className="form-control"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           placeholder="Ex.: Dona Maria"
           autoComplete="given-name"
+          style={{ maxWidth: '300px' }}
         />
-        <p className="detalhe">O assistente usa seu nome nas instruções faladas: “Muito bem, Dona Maria!”.</p>
+        <p className="text-muted mt-2">O assistente usa seu nome nas instruções faladas: "Muito bem, Dona Maria!".</p>
       </section>
     </div>
   );
